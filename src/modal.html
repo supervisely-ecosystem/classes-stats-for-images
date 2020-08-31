@@ -7,6 +7,6 @@
 
     <sly-field title="Sample (%)"
                description="Stats will be calculated only for the defined random sample of images (%)">
-        <el-slider v-model="state.samplePercentage" show-input></el-slider>
+        <el-slider v-model="state.samplePercent" :min="1" show-input></el-slider>
     </sly-field>
 </div>

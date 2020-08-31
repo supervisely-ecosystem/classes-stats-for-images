@@ -3,33 +3,60 @@ import supervisely_lib as sly
 
 my_app = sly.AppService()
 
+TEAM_ID = int(os.environ['modal.state.teamId'])
+WORKSPACE_ID = int(os.environ['modal.state.workspaceId'])
+PROJECT_ID = os.environ.get('modal.state.projectId', None)
+DATASET_ID = os.environ.get('modal.state.datasetId', None)
+SAMPLE_PERCENT = int(os.environ['modal.state.samplePercent'])
+
+sly.logger.info("Script arguments",
+                extra={"teamId: ": TEAM_ID,
+                       "workspaceId: ": WORKSPACE_ID,
+                       "projectId": PROJECT_ID,
+                       "datasetId": DATASET_ID,
+                       "samplePercent": SAMPLE_PERCENT})
+
 # @my_app.callback("manual_selected_figure_changed")
 # @sly.timeit
 # def manual_selected_figure_changed(api: sly.Api, task_id, context, state, app_logger):
 #     pass
 #     #_refresh_upc(api, task_id, context, state, app_logger)
 
+@sly.timeit
+@my_app.callback("calc")
+def calc(api: sly.Api, task_id, context, state, app_logger):
+    print("Done !!!")
+
+
 def main():
     api = sly.Api.from_env()
 
     data = {
+        "table": [
+            {"a": 1, "b": 10},
+            {"a": 2, "b": 20},
+            {"a": 3, "b": 30},
+        ],
+
     }
 
     state = {
         "test": 12,
+        "perPage": 20,
+        "pageSizes": [5, 10, 30, 50, 100],
+        "progress": 70
     }
 
-    # # start event after successful service run
-    # events = [
-    #     {
-    #         "state": {},
-    #         "context": {},
-    #         "command": "calculate"
-    #     }
-    # ]
+    initial_events = [
+        {
+            "state": None,
+            "context": None,
+            "command": "calc"
+        }
+    ]
 
     # Run application service
-    my_app.run(data=data, state=state)
+    my_app.run(data=data, state=state, initial_events=initial_events)
 
 
 if __name__ == "__main__":

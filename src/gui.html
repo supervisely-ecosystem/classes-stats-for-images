@@ -1,6 +1,18 @@
 <div>
+    <!--
     <sly-field title="title"
                description="description">
         <el-slider v-model="state.test" :min="1" :max="20" show-input></el-slider>
     </sly-field>
+    -->
+
+    <card v-if="state.progress !== 100"> <el-progress :percentage="state.progress"></el-progress> </card>
+
+    <card title="Classes area/count"
+          subtitle="Detailed classes statistics for every image"
+          style="margin-top: 15px;">
+        <sly-table :options="{ perPage: state.perPage, pageSizes: state.pageSizes}" :content="data.table"></sly-table>
+    </card>
+
+<!--          "style="height:100%; margin-top: 15px;"-->
 </div>
