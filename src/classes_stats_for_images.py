@@ -16,6 +16,22 @@ PROJECT_ID = os.environ.get('modal.state.inputProjectId', None)
 DATASET_ID = os.environ.get('modal.state.inputDatasetId', None)
 SAMPLE_PERCENT = int(os.environ['modal.state.samplePercent'])
 BG_COLOR = [0, 0, 0]
+BATCH_SIZE = 1
+
+progress = 0
+
+def _col_name(name, color, icon):
+    return '<b style="display: inline-block; border-radius: 50%; ' \
+           'background: {}; width: 8px; height: 8px"></b> {} ' \
+           '[ <i class="zmdi zmdi-time-interval" style="color:{};margin-right:3px"></i> ]'.format(color, name, color, icon)
+
+
+def get_col_name_area(name, color):
+    return _col_name(name, color, "zmdi-time-interval")
+
+
+def get_col_name_count(name, color):
+    return _col_name(name, color, "zmdi-equalizer")
 
 
 def sample_images(api, datasets):
@@ -25,19 +41,21 @@ def sample_images(api, datasets):
         all_images.extend(images)
 
     if SAMPLE_PERCENT != 100:
-        cnt_images = max(1, SAMPLE_PERCENT * len(all_images) / 100)
+        cnt_images = int(max(1, SAMPLE_PERCENT * len(all_images) / 100))
         random.shuffle(all_images)
         all_images = all_images[:cnt_images]
 
     ds_images = defaultdict(list)
     for image_info in all_images:
         ds_images[image_info.dataset_id].append(image_info)
-    return ds_images
+    return ds_images, cnt_images
 
 
 @sly.timeit
 @my_app.callback("calc")
 def calc(api: sly.Api, task_id, context, state, app_logger):
+    global progress
+
     project = None
     datasets = []
     if PROJECT_ID is not None:
@@ -55,23 +73,33 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     colors_warning = meta.obj_classes.validate_classes_colors()
 
     # list classes
-    class_names = []
-    class_colors = []
-    class_indices = []  # 0 - for unlabeled area
-    class_indices_colors = []
+    class_names = ["unlabeled"]
+    class_colors = [[0, 0, 0]]
+    class_indices_colors = [[0, 0, 0]]
     _name_to_index = {}
+    table_columns = []
     for idx, obj_class in enumerate(meta.obj_classes):
         class_names.append(obj_class.name)
         class_colors.append(obj_class.color)
         class_index = idx + 1
-        class_indices.append(class_index)
         class_indices_colors.append([class_index, class_index, class_index])
         _name_to_index[obj_class.name] = class_index
+        table_columns = obj_class.name + " ()".format()
 
-    ds_images = sample_images(datasets)
-    all_stats = []
+    #"data.table.columns"
+
+
+    ds_images, sample_count = sample_images(api, datasets)
+    all_stats_area = []
+    all_stats_count = []
+    all_stats_info = []
     for dataset_id, images in ds_images.items():
-        for batch in sly.batched(images):
+        #@TODO: debug batch size
+        for batch in sly.batched(images, batch_size=BATCH_SIZE):
+            batch_stats_area = []
+            batch_stats_count = []
+            batch_stats_info = []
+
             image_ids = [image_info.id for image_info in batch]
             image_names = [image_info.name for image_info in batch]
 
@@ -84,30 +112,29 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
                 render_idx_rgb = np.zeros(ann.img_size + (3,), dtype=np.uint8)
                 render_idx_rgb[:] = BG_COLOR
                 ann.draw_class_idx_rgb(render_idx_rgb, _name_to_index)
-                temp_area = sly.Annotation.stat_area(render_idx_rgb, class_names, class_indices_colors)
+                stat_area = sly.Annotation.stat_area(render_idx_rgb, class_names, class_indices_colors)
+                stat_count = ann.stat_class_count(class_names)
 
-                x = 10
-                # temp_count = ann.stat_class_count(class_names)
-                # if len(tag_names) != 0:
-                #     temp_img_tags = ann.stat_img_tags(tag_names)
-                #
-                # temp_area['id'] = info.id
-                # temp_area['dataset'] = dataset.name
-                # temp_area['name'] = '<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>' \
-                #     .format(api.image.url(team.id,
-                #                           workspace.id,
-                #                           project.id,
-                #                           dataset.id,
-                #                           info.id),
-                #             info.name)
-                #
-                # stats_area.append(temp_area)
-                # stats_count.append(temp_count)
-                # if len(tag_names) != 0:
-                #     stats_img_tags.append(temp_img_tags)
+                stat_info = {}
+                stat_info['id'] = info.id
+                stat_info['dataset'] = dataset.name
+                stat_info['name'] = '<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>' \
+                                    .format(api.image.url(TEAM_ID, WORKSPACE_ID, project.id, dataset.id, info.id),
+                                            info.name)
 
-            # ds_progress.iters_done_report(len(batch))
-            # total_images_in_project += len(batch)
+                batch_stats_area.append(stat_area)
+                batch_stats_count.append(stat_count)
+                batch_stats_info.append(stat_info)
+
+            all_stats_area.extend(batch_stats_area)
+            all_stats_count.extend(batch_stats_count)
+            all_stats_info.extend(batch_stats_info)
+
+            #progress += batch_stats_area
+            #api.task.set_field(task_id, "data", {"progress": int(progress / sample_count),
+            #                                     "table.data"})
+            #ds_progress.iters_done_report(len(batch))
+            #total_images_in_project += len(batch)
 
 
 def main():
@@ -124,37 +151,40 @@ def main():
     # print(json.dumps(df.to_json(orient='split')))
 
     data = {
-        "table": [
-            {"a": 1, "b": 10},
-            {"a": 2, "b": 20},
-            {"a": 3, "b": 30},
-        ],
-        "table2": {
-            "columns": ["b", "a"],
-            "data": [
-                [1, 10],
-                [2, 20],
-                [3, 30],
-            ]
-        }
-
+        # "table": [
+        #     {"a": 1, "b": 10},
+        #     {"a": 2, "b": 20},
+        #     {"a": 3, "b": 30},
+        # ],
+        # "table2": {
+        #     "columns": ["b", "a"],
+        #     "data": [
+        #         [1, 10],
+        #         [2, 20],
+        #         [3, 30],
+        #     ]
+        # },
+        "table": {
+            "columns": [],
+            "data": []
+        },
+        "progress": progress
     }
 
     state = {
         "test": 12,
         "perPage": 20,
         "pageSizes": [5, 10, 30, 50, 100],
-        "progress": 20
     }
 
-    # initial_events = [
-    #     {
-    #         "state": None,
-    #         "context": None,
-    #         "command": "calc"
-    #     }
-    # ]
-    initial_events = []
+    initial_events = [
+        {
+            "state": None,
+            "context": None,
+            "command": "calc",
+        }
+    ]
+    #initial_events = []
 
 
     # Run application service
