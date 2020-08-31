@@ -2,51 +2,21 @@ import os
 import supervisely_lib as sly
 import random
 from collections import defaultdict
+import pandas as pd
+import json
+# <!--    <sly-notification content="<Текст нотификации в маркдауне>" :options="{ type: 'note|info|warning|error', name: '<заголовок нотификации>'}" />-->
+
 
 my_app = sly.AppService()
 
 TEAM_ID = int(os.environ['modal.state.teamId'])
 WORKSPACE_ID = int(os.environ['modal.state.workspaceId'])
-PROJECT_ID = os.environ.get('modal.state.projectId', None)
-DATASET_ID = os.environ.get('modal.state.datasetId', None)
+PROJECT_ID = os.environ.get('modal.state.inputProjectId', None)
+DATASET_ID = os.environ.get('modal.state.inputDatasetId', None)
 SAMPLE_PERCENT = int(os.environ['modal.state.samplePercent'])
 
 
-def validate_classes_colors(project_meta: sly.ProjectMeta):
-    # check colors uniq
-    color_names = defaultdict(list)
-    for obj_class in project_meta.obj_classes:
-        hex = sly.color.rgb2hex(obj_class.color)
-        color_names[hex].append(obj_class.name)
-
-    class_colors_notify = ""
-    for k, v in color_names.items():
-        if len(v) > 1:
-            warn_str = "Classes {!r} have the same RGB color = {!r}".format(v, sly.color.hex2rgb(k))
-            sly.logger.warn(warn_str)
-            class_colors_notify += warn_str + '\n\n'
-    if class_colors_notify != "":
-        widgets.append(
-            api.report.create_notification("Classes colors", class_colors_notify, sly.NotificationType.WARNING))
-
-@sly.timeit
-@my_app.callback("calc")
-def calc(api: sly.Api, task_id, context, state, app_logger):
-    project = None
-    datasets = []
-    if PROJECT_ID is not None:
-        project = api.project.get_info_by_id(PROJECT_ID)
-        datasets = api.dataset.get_list(PROJECT_ID)
-    elif DATASET_ID is not None:
-        dataset = api.dataset.get_info_by_id(DATASET_ID)
-        datasets = [dataset]
-        project = api.project.get_info_by_id(dataset.project_id)
-
-    meta_json = api.project.get_meta(project.id)
-    meta = sly.ProjectMeta.from_json(meta_json)
-
-
-
+def sample_images(api, datasets):
     all_images = []
     for dataset in datasets:
         images = api.image.get_list(dataset.id)
@@ -61,15 +31,33 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     for image_info in all_images:
         ds_images[image_info.dataset_id].append(image_info)
 
+@sly.timeit
+@my_app.callback("calc")
+def calc(api: sly.Api, task_id, context, state, app_logger):
+    project = None
+    datasets = []
+    if PROJECT_ID is not None:
+        project = api.project.get_info_by_id(PROJECT_ID)
+        datasets = api.dataset.get_list(PROJECT_ID)
+    elif DATASET_ID is not None:
+        dataset = api.dataset.get_info_by_id(DATASET_ID)
+        datasets = [dataset]
+        project = api.project.get_info_by_id(dataset.project_id)
+    else:
+        raise ValueError("Both project and dataset are not defined.")
+
+    meta_json = api.project.get_meta(project.id)
+    meta = sly.ProjectMeta.from_json(meta_json)
+    colors_warning = meta.obj_classes.validate_classes_colors()
+
+
+
     all_stats = []
     for dataset_id, images in ds_images.items():
         for batch in sly.batched(images):
             stats = []
             for image_info in batch:
-
-
-
-
+                pass
 
 def main():
     sly.logger.info("Script arguments", extra={"teamId: ": TEAM_ID, "workspaceId: ": WORKSPACE_ID,
@@ -77,6 +65,12 @@ def main():
                                                "samplePercent": SAMPLE_PERCENT})
 
     api = sly.Api.from_env()
+    # df = pd.DataFrame(
+    #     [["a", "b"], ["c", "d"]],
+    #     index=["row 1", "row 2"],
+    #     columns=["col 1", "col 2"],
+    # )
+    # print(json.dumps(df.to_json(orient='split')))
 
     data = {
         "table": [
@@ -84,6 +78,14 @@ def main():
             {"a": 2, "b": 20},
             {"a": 3, "b": 30},
         ],
+        "table2": {
+            "columns": ["b", "a"],
+            "data": [
+                [1, 10],
+                [2, 20],
+                [3, 30],
+            ]
+        }
 
     }
 
@@ -94,13 +96,15 @@ def main():
         "progress": 20
     }
 
-    initial_events = [
-        {
-            "state": None,
-            "context": None,
-            "command": "calc"
-        }
-    ]
+    # initial_events = [
+    #     {
+    #         "state": None,
+    #         "context": None,
+    #         "command": "calc"
+    #     }
+    # ]
+    initial_events = []
+
 
     # Run application service
     my_app.run(data=data, state=state, initial_events=initial_events)
