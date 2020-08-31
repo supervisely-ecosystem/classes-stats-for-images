@@ -10,11 +10,9 @@
   "main_script": "src/classes_stats_for_images.py",
   "modal_template": "src/modal.html",
   "modal_template_state": {
-    "teamId": null,
-    "workspaceId": null,
-    "projectName": ""
+    "samplePercentage": 25
   },
-  "gui_template": null,
+  "gui_template": "src/gui.html",
   "task_location": "workspace_tasks",
   "open_mode???": "headless???",
   "isolate": true,
