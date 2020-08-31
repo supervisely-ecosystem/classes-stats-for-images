@@ -84,10 +84,11 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
         class_index = idx + 1
         class_indices_colors.append([class_index, class_index, class_index])
         _name_to_index[obj_class.name] = class_index
-        table_columns = obj_class.name + " ()".format()
+        table_columns.append(get_col_name_area(obj_class.name, obj_class.color))
+        table_columns.append(get_col_name_count(obj_class.name, obj_class.color))
 
     #"data.table.columns"
-
+    api.task.set_field(task_id, "data.table.columns", table_columns)
 
     ds_images, sample_count = sample_images(api, datasets)
     all_stats_area = []
