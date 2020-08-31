@@ -1,8 +1,9 @@
 {
-  "name": "[Report] Classes stats for images",
+  "name": "Classes stats for images",
   "type": "app",
   "categories": [
-    "report"
+    "report",
+    "images"
   ],
   "description": "Detailed statistics for all classes in images project",
   "docker_image": "docker.deepsystems.io/supervisely/five/python-runner:ecosystem_add_images_project",
@@ -15,7 +16,8 @@
   },
   "gui_template": null,
   "task_location": "workspace_tasks",
-  "open_mode???": "headless",
+  "open_mode???": "headless???",
   "isolate": true,
-  "system": true
+  "system???": false,
+  "context": "???"
 }
