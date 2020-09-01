@@ -23,7 +23,7 @@ progress = 0
 def _col_name(name, color, icon):
     return '<b style="display: inline-block; border-radius: 50%; ' \
            'background: {}; width: 8px; height: 8px"></b> {} ' \
-           '[ <i class="zmdi zmdi-time-interval" style="color:{};margin-right:3px"></i> ]'.format(color, name, color, icon)
+           ' <i class="zmdi {}" style="color:{};margin-right:3px"></i>'.format(color, name, icon, color)
 
 
 def get_col_name_area(name, color):
@@ -49,6 +49,11 @@ def sample_images(api, datasets):
     for image_info in all_images:
         ds_images[image_info.dataset_id].append(image_info)
     return ds_images, cnt_images
+
+# def convert_to_columns_view(data_info, class_names, col_name_func):
+#     result = []
+#     for class_name in class_names:
+
 
 
 @sly.timeit
@@ -77,7 +82,7 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     class_colors = [[0, 0, 0]]
     class_indices_colors = [[0, 0, 0]]
     _name_to_index = {}
-    table_columns = []
+    table_columns = ["id", "dataset", "name", "height", "width", "channels", "unlabeled"]
     for idx, obj_class in enumerate(meta.obj_classes):
         class_names.append(obj_class.name)
         class_colors.append(obj_class.color)
@@ -87,23 +92,17 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
         table_columns.append(get_col_name_area(obj_class.name, obj_class.color))
         table_columns.append(get_col_name_count(obj_class.name, obj_class.color))
 
-    #"data.table.columns"
     api.task.set_field(task_id, "data.table.columns", table_columns)
 
     ds_images, sample_count = sample_images(api, datasets)
-    all_stats_area = []
-    all_stats_count = []
-    all_stats_info = []
+    all_stats = []
+    task_progress = sly.Progress("Stats", sample_count, app_logger)
     for dataset_id, images in ds_images.items():
         #@TODO: debug batch size
         for batch in sly.batched(images, batch_size=BATCH_SIZE):
-            batch_stats_area = []
-            batch_stats_count = []
-            batch_stats_info = []
+            batch_stats = []
 
             image_ids = [image_info.id for image_info in batch]
-            image_names = [image_info.name for image_info in batch]
-
             ann_infos = api.annotation.download_batch(dataset_id, image_ids)
             ann_jsons = [ann_info.annotation for ann_info in ann_infos]
 
@@ -116,26 +115,28 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
                 stat_area = sly.Annotation.stat_area(render_idx_rgb, class_names, class_indices_colors)
                 stat_count = ann.stat_class_count(class_names)
 
-                stat_info = {}
-                stat_info['id'] = info.id
-                stat_info['dataset'] = dataset.name
-                stat_info['name'] = '<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>' \
-                                    .format(api.image.url(TEAM_ID, WORKSPACE_ID, project.id, dataset.id, info.id),
-                                            info.name)
+                table_row = []
+                table_row.append(info.id)
+                table_row.append(dataset.name)
+                table_row.append('<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>'
+                                 .format(api.image.url(TEAM_ID, WORKSPACE_ID, project.id, dataset.id, info.id), info.name))
+                table_row.append(stat_area["unlabeled"])
+                for class_name in class_names:
+                    if class_name == "unlabeled":
+                        continue
+                    table_row.append(stat_area[class_name])
+                    table_row.append(stat_count[class_name])
+                batch_stats.append(table_row)
 
-                batch_stats_area.append(stat_area)
-                batch_stats_count.append(stat_count)
-                batch_stats_info.append(stat_info)
+            all_stats.extend(batch_stats)
 
-            all_stats_area.extend(batch_stats_area)
-            all_stats_count.extend(batch_stats_count)
-            all_stats_info.extend(batch_stats_info)
-
-            #progress += batch_stats_area
-            #api.task.set_field(task_id, "data", {"progress": int(progress / sample_count),
-            #                                     "table.data"})
-            #ds_progress.iters_done_report(len(batch))
-            #total_images_in_project += len(batch)
+            progress += len(batch_stats)
+            payload = {
+                "progress": int(progress * 100 / sample_count),
+                "table.data": batch_stats
+            }
+            api.task.set_field(task_id, "data", payload, append=True)
+            task_progress.iters_done_report(len(batch_stats))
 
 
 def main():
@@ -157,7 +158,7 @@ def main():
         #     {"a": 2, "b": 20},
         #     {"a": 3, "b": 30},
         # ],
-        # "table2": {
+        # "table": {
         #     "columns": ["b", "a"],
         #     "data": [
         #         [1, 10],
