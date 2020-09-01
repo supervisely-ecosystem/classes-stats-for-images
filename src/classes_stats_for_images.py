@@ -20,6 +20,7 @@ BATCH_SIZE = 1
 
 progress = 0
 
+
 def _col_name(name, color, icon):
     return '<b style="display: inline-block; border-radius: 50%; ' \
            'background: {}; width: 8px; height: 8px"></b> {} ' \
@@ -120,12 +121,15 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
                 table_row.append(dataset.name)
                 table_row.append('<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>'
                                  .format(api.image.url(TEAM_ID, WORKSPACE_ID, project.id, dataset.id, info.id), info.name))
-                table_row.append(stat_area["unlabeled"])
+                table_row.extend([stat_area["height"], stat_area["width"], stat_area["channels"], stat_area["unlabeled"]])
                 for class_name in class_names:
                     if class_name == "unlabeled":
                         continue
                     table_row.append(stat_area[class_name])
                     table_row.append(stat_count[class_name])
+
+                if len(table_row) != len(table_columns):
+                    raise RuntimeError("Values for some columns are missed")
                 batch_stats.append(table_row)
 
             all_stats.extend(batch_stats)
@@ -133,9 +137,13 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
             progress += len(batch_stats)
             payload = {
                 "progress": int(progress * 100 / sample_count),
-                "table.data": batch_stats
+                "table": {
+                    "data": batch_stats
+                }
             }
-            api.task.set_field(task_id, "data", payload, append=True)
+            api.task.set_field(task_id, "data.progress", payload)
+            api.task.set_field(task_id, "data.table.data", payload, append=True)
+
             task_progress.iters_done_report(len(batch_stats))
 
 

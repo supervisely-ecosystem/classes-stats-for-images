@@ -1,7 +1,8 @@
 <div>
     <card v-if="state.progress !== 100"> <el-progress :percentage="state.progress"></el-progress> </card>
     <card title="Classes area/count"
-          subtitle="Detailed classes statistics for every image"
+          subtitle='Detailed classes statistics for every image
+                    (<i class="zmdi {}" style="color:{};margin-right:3px"></i>)'
           style="margin-top: 15px;">
         <sly-table :options="{ perPage: state.perPage, pageSizes: state.pageSizes}" :content="data.table"></sly-table>
     </card>
