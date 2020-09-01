@@ -138,11 +138,26 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
             payload = {
                 "progress": int(progress * 100 / sample_count),
                 "table": {
-                    "data": batch_stats
+                    "data": batch_stats,
+                    "data2": [1, 2, 3]
                 }
             }
-            api.task.set_field(task_id, "data.progress", payload)
-            api.task.set_field(task_id, "data.table.data", payload, append=True)
+
+            # from supervisely_lib.io.json import flatten_json, modify_keys
+            # modal_envs = flatten_json(modal_state)
+            # modal_envs = modify_keys(modal_envs, prefix="modal.state.")
+
+            # fields = {
+            #     "progress": int(progress * 100 / sample_count),
+            #     "table": {
+            #         "data": batch_stats,
+            #         "data2": [1, 2, 3]
+            #     }
+            # }
+            #
+            #
+            # api.task.set_field(task_id, "data.progress", payload)
+            # api.task.set_field(task_id, "data.table", payload, append=True, recursive=True)
 
             task_progress.iters_done_report(len(batch_stats))
 
