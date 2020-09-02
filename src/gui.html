@@ -8,5 +8,6 @@
             <i class="zmdi zmdi-equalizer"></i> - number of objects
         </div>
         <sly-table :options="{ perPage: state.perPage, pageSizes: state.pageSizes}" :content="data.table"></sly-table>
+        <sly-plotly :content="data.avgAreaCount"></sly-plotly>
     </card>
 </div>

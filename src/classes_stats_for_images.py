@@ -5,6 +5,7 @@ from collections import defaultdict
 import pandas as pd
 import json
 import numpy as np
+import plotly.graph_objects as go
 
 my_app = sly.AppService()
 
@@ -14,9 +15,12 @@ PROJECT_ID = os.environ.get('modal.state.inputProjectId', None)
 DATASET_ID = os.environ.get('modal.state.inputDatasetId', None)
 SAMPLE_PERCENT = int(os.environ['modal.state.samplePercent'])
 BG_COLOR = [0, 0, 0]
-BATCH_SIZE = 15
+BATCH_SIZE = 50
 
 progress = 0
+sum_class_area_per_image = []
+sum_class_count_per_image = []
+count_images_with_class = []
 
 
 def _col_name(name, color, icon):
@@ -38,6 +42,7 @@ def sample_images(api, datasets):
         images = api.image.get_list(dataset.id)
         all_images.extend(images)
 
+    cnt_images = len(all_images)
     if SAMPLE_PERCENT != 100:
         cnt_images = int(max(1, SAMPLE_PERCENT * len(all_images) / 100))
         random.shuffle(all_images)
@@ -48,15 +53,11 @@ def sample_images(api, datasets):
         ds_images[image_info.dataset_id].append(image_info)
     return ds_images, cnt_images
 
-# def convert_to_columns_view(data_info, class_names, col_name_func):
-#     result = []
-#     for class_name in class_names:
-
 
 @my_app.callback("calc")
 @sly.timeit
 def calc(api: sly.Api, task_id, context, state, app_logger):
-    global progress
+    global progress, sum_class_area_per_image, sum_class_count_per_image, count_images_with_class
 
     project = None
     datasets = []
@@ -89,13 +90,17 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
         table_columns.append(get_col_name_area(obj_class.name, obj_class.color))
         table_columns.append(get_col_name_count(obj_class.name, obj_class.color))
 
+    sum_class_area_per_image = [0] * len(class_names)
+    sum_class_count_per_image = [0] * len(class_names)
+    count_images_with_class = [0] * len(class_names)
+    count_images_with_class[0] = 1  # for unlabeled
+
     api.task.set_field(task_id, "data.table.columns", table_columns)
 
     ds_images, sample_count = sample_images(api, datasets)
     all_stats = []
     task_progress = sly.Progress("Stats", sample_count, app_logger)
     for dataset_id, images in ds_images.items():
-        #@TODO: debug batch size
         for batch in sly.batched(images, batch_size=BATCH_SIZE):
             batch_stats = []
 
@@ -118,9 +123,13 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
                 table_row.append('<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>'
                                  .format(api.image.url(TEAM_ID, WORKSPACE_ID, project.id, dataset.id, info.id), info.name))
                 table_row.extend([stat_area["height"], stat_area["width"], stat_area["channels"], stat_area["unlabeled"]])
-                for class_name in class_names:
+                for idx, class_name in enumerate(class_names):
+                    sum_class_area_per_image[idx] += stat_area[class_name]
                     if class_name == "unlabeled":
                         continue
+
+                    sum_class_count_per_image[idx] += stat_area[class_name]
+                    count_images_with_class[idx] += 1 if stat_count[class_name] > 0 else 0
                     table_row.append(round(stat_area[class_name], 2))
                     table_row.append(round(stat_count[class_name], 2))
 
@@ -129,8 +138,22 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
                 batch_stats.append(table_row)
 
             all_stats.extend(batch_stats)
-
             progress += len(batch_stats)
+
+            avg_nonzero_area = np.divide(sum_class_area_per_image, count_images_with_class)
+            avg_nonzero_count = np.divide(sum_class_count_per_image, count_images_with_class)
+            fig = go.Figure(
+                data=[
+                    go.Bar(name='Area %', x=class_names, y=avg_nonzero_area, yaxis='y', offsetgroup=1),
+                    go.Bar(name='Count', x=class_names, y=avg_nonzero_count, yaxis='y2', offsetgroup=2)
+                ],
+                layout={
+                    'yaxis': {'title': 'Area'},
+                    'yaxis2': {'title': 'Count', 'overlaying': 'y', 'side': 'right'}
+                }
+            )
+            # Change the bar mode
+            fig.update_layout(barmode='group')  # , legend_orientation="h")
 
             fields = [
                 {
@@ -141,7 +164,12 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
                     "field": "data.table.data",
                     "payload": batch_stats,
                     "append": True
-                }
+                },
+                {
+                    "field": "data.avgAreaCount",
+                    #@TODO: refresh only values
+                    "payload": fig.to_json()
+                },
             ]
             api.task.set_fields(task_id, fields)
             task_progress.iters_done_report(len(batch_stats))
@@ -159,7 +187,8 @@ def main():
             "columns": [],
             "data": []
         },
-        "progress": progress
+        "progress": progress,
+        "avgAreaCount": []
     }
 
     state = {
