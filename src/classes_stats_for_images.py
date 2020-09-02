@@ -6,6 +6,7 @@ import pandas as pd
 import json
 import numpy as np
 import plotly.graph_objects as go
+#import plotly.express as px
 
 my_app = sly.AppService()
 
@@ -21,6 +22,7 @@ progress = 0
 sum_class_area_per_image = []
 sum_class_count_per_image = []
 count_images_with_class = []
+resolutions_count = defaultdict(int)
 
 
 def _col_name(name, color, icon):
@@ -70,6 +72,18 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
         project = api.project.get_info_by_id(dataset.project_id)
     else:
         raise ValueError("Both project and dataset are not defined.")
+
+    fields = [
+        {
+            "field": "data.projectName",
+            "payload": project.name
+        },
+        {
+            "field": "data.projectId",
+            "payload": project.id,
+        }
+    ]
+    api.task.set_fields(task_id, fields)
 
     meta_json = api.project.get_meta(project.id)
     meta = sly.ProjectMeta.from_json(meta_json)
@@ -123,11 +137,11 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
                 table_row.append('<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>'
                                  .format(api.image.url(TEAM_ID, WORKSPACE_ID, project.id, dataset.id, info.id), info.name))
                 table_row.extend([stat_area["height"], stat_area["width"], stat_area["channels"], stat_area["unlabeled"]])
+                resolutions_count["{}x{}x{}".format(stat_area["height"], stat_area["width"], stat_area["channels"])] += 1
                 for idx, class_name in enumerate(class_names):
                     sum_class_area_per_image[idx] += stat_area[class_name]
                     if class_name == "unlabeled":
                         continue
-
                     sum_class_count_per_image[idx] += stat_area[class_name]
                     count_images_with_class[idx] += 1 if stat_count[class_name] > 0 else 0
                     table_row.append(round(stat_area[class_name], 2))
@@ -140,21 +154,6 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
             all_stats.extend(batch_stats)
             progress += len(batch_stats)
 
-            avg_nonzero_area = np.divide(sum_class_area_per_image, count_images_with_class)
-            avg_nonzero_count = np.divide(sum_class_count_per_image, count_images_with_class)
-            fig = go.Figure(
-                data=[
-                    go.Bar(name='Area %', x=class_names, y=avg_nonzero_area, yaxis='y', offsetgroup=1),
-                    go.Bar(name='Count', x=class_names, y=avg_nonzero_count, yaxis='y2', offsetgroup=2)
-                ],
-                layout={
-                    'yaxis': {'title': 'Area'},
-                    'yaxis2': {'title': 'Count', 'overlaying': 'y', 'side': 'right'}
-                }
-            )
-            # Change the bar mode
-            fig.update_layout(barmode='group')  # , legend_orientation="h")
-
             fields = [
                 {
                     "field": "data.progress",
@@ -164,15 +163,117 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
                     "field": "data.table.data",
                     "payload": batch_stats,
                     "append": True
-                },
-                {
-                    "field": "data.avgAreaCount",
-                    #@TODO: refresh only values
-                    "payload": fig.to_json()
-                },
+                }
             ]
             api.task.set_fields(task_id, fields)
             task_progress.iters_done_report(len(batch_stats))
+
+    # average nonzero class area per image
+    avg_nonzero_area = np.divide(sum_class_area_per_image, count_images_with_class)
+    avg_nonzero_count = np.divide(sum_class_count_per_image, count_images_with_class)
+    fig = go.Figure(
+        data=[
+            go.Bar(name='Area %', x=class_names, y=avg_nonzero_area, yaxis='y', offsetgroup=1),
+            go.Bar(name='Count', x=class_names, y=avg_nonzero_count, yaxis='y2', offsetgroup=2)
+        ],
+        layout={
+            'yaxis': {'title': 'Area'},
+            'yaxis2': {'title': 'Count', 'overlaying': 'y', 'side': 'right'}
+        }
+    )
+    # Change the bar mode
+    fig.update_layout(barmode='group')  # , legend_orientation="h")
+
+
+    # images count with/without classes
+    images_with_count = []
+    images_without_count = []
+    images_with_count_text = []
+    images_without_count_text = []
+    for idx, class_name in enumerate(class_names):
+        if class_name == "unlabeled":
+            continue
+        with_count = count_images_with_class[idx]
+        without_count = sample_count - with_count
+        images_with_count.append(with_count)
+        images_without_count.append(without_count)
+        images_with_count_text.append("{} ({:.2f} %)".format(with_count, with_count * 100 / sample_count))
+        images_without_count_text.append("{} ({:.2f} %)".format(without_count, without_count * 100 / sample_count))
+
+    fig_with_without_count = go.Figure(
+        data=[
+            go.Bar(name='# of images that have class', x=class_names, y=images_with_count, text=images_with_count_text),
+            go.Bar(name='# of images that do not have class', x=class_names, y=images_without_count, text=images_without_count_text)
+        ],
+    )
+    fig_with_without_count.update_layout(barmode='stack')  # , legend_orientation="h")
+
+    # barchart resolution
+    resolution_labels = []
+    resolution_values = []
+    resolution_percent = []
+    for label, value in sorted(resolutions_count.items(), key=lambda item: item[1], reverse=True):
+        resolution_labels.append(label)
+        resolution_values.append(value)
+    if len(resolution_labels) > 10:
+        resolution_labels = resolution_labels[:10]
+        resolution_labels.append("other")
+        other_value = sum(resolution_values[10:])
+        resolution_values = resolution_values[:10]
+        resolution_values.append(other_value)
+    resolution_percent = [round(v * 100 / sample_count) for v in resolution_values]
+
+    #df_resolution = pd.DataFrame({'resolution': resolution_labels, 'count': resolution_values, 'percent': resolution_percent})
+    pie_resolution = go.Figure(data=[go.Pie(labels=resolution_labels, values=resolution_values)])
+    #pie_resolution = px.pie(df_resolution, names='resolution', values='count')
+
+    fields = [
+        {
+            "field": "data.avgAreaCount",
+            "payload": json.loads(fig.to_json())
+        },
+        {
+            "field": "data.imageWithClassCount",
+            "payload": json.loads(fig_with_without_count.to_json())
+        },
+        {
+            "field": "data.resolutionsCount",
+            "payload": json.loads(pie_resolution.to_json())
+        },
+        {
+            "field": "data.resolutionsCount",
+            "payload": json.loads(pie_resolution.to_json())
+        },
+        {
+            "field": "data.loading1",
+            "payload": False
+        },
+        {
+            "field": "data.loading2",
+            "payload": False
+        },
+        {
+            "field": "data.loading3",
+            "payload": False
+        }
+    ]
+    api.task.set_fields(task_id, fields)
+
+    #@TODO: hotfix - pie chart do not refreshes automatically
+    fields = [
+        {
+            "field": "data.resolutionsCount",
+            "payload": json.loads(pie_resolution.to_json())
+        }
+    ]
+    api.task.set_fields(task_id, fields)
+    fields = [
+        {
+            "field": "data.resolutionsCount",
+            "payload": json.loads(pie_resolution.to_json())
+        }
+    ]
+    api.task.set_fields(task_id, fields)
 
 
 def main():
@@ -188,7 +289,14 @@ def main():
             "data": []
         },
         "progress": progress,
-        "avgAreaCount": []
+        "loading1": True,
+        "loading2": True,
+        "loading3": True,
+        "avgAreaCount": json.loads(go.Figure().to_json()),
+        "imageWithClassCount": json.loads(go.Figure().to_json()),
+        "resolutionsCount": json.loads(go.Figure().to_json()),
+        "projectName": "",
+        "projectId": ""
     }
 
     state = {
@@ -202,6 +310,11 @@ def main():
             "state": None,
             "context": None,
             "command": "calc",
+        },
+        {
+            "state": None,
+            "context": None,
+            "command": "stop",
         }
     ]
 
@@ -211,17 +324,3 @@ def main():
 
 if __name__ == "__main__":
     sly.main_wrapper("main", main)
-
-
-
-# Icons:
-# <i class="zmdi zmdi-time-interval"></i>
-# <i class="zmdi zmdi-format-color-fill"></i>
-# Count
-# <i class="zmdi zmdi-collection-item-7"></i>
-# <i class="zmdi zmdi-n-3-square"></i>
-# <i class="zmdi zmdi-equalizer"></i>
-# <i class="zmdi zmdi-chart"></i>
-
-#Pascal stats
-# #http://host.robots.ox.ac.uk/pascal/VOC/voc2012/dbstats.html
