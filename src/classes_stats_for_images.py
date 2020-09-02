@@ -136,13 +136,16 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
                 table_row.append(dataset.name)
                 table_row.append('<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>'
                                  .format(api.image.url(TEAM_ID, WORKSPACE_ID, project.id, dataset.id, info.id), info.name))
-                table_row.extend([stat_area["height"], stat_area["width"], stat_area["channels"], stat_area["unlabeled"]])
+                table_row.extend([stat_area["height"],
+                                  stat_area["width"],
+                                  stat_area["channels"],
+                                  round(stat_area["unlabeled"], 2)])
                 resolutions_count["{}x{}x{}".format(stat_area["height"], stat_area["width"], stat_area["channels"])] += 1
                 for idx, class_name in enumerate(class_names):
                     sum_class_area_per_image[idx] += stat_area[class_name]
+                    sum_class_count_per_image[idx] += stat_area[class_name]
                     if class_name == "unlabeled":
                         continue
-                    sum_class_count_per_image[idx] += stat_area[class_name]
                     count_images_with_class[idx] += 1 if stat_count[class_name] > 0 else 0
                     table_row.append(round(stat_area[class_name], 2))
                     table_row.append(round(stat_count[class_name], 2))
