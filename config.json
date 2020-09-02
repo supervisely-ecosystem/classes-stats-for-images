@@ -14,8 +14,11 @@
   },
   "gui_template": "src/gui.html",
   "task_location": "workspace_tasks",
-  "open_mode???": "headless???",
   "isolate": true,
-  "system???": false,
-  "context": "???"
+  "context_menu": {
+    "target": ["images_project", "images_dataset"],
+    "context_root": "Report"
+  },
+  "icon": "https://img.icons8.com/bubbles/100/000000/combo-chart.png",
+  "icon_background": "#FFFFFF"
 }

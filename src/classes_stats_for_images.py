@@ -230,6 +230,11 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     pie_resolution = go.Figure(data=[go.Pie(labels=resolution_labels, values=resolution_values)])
     #pie_resolution = px.pie(df_resolution, names='resolution', values='count')
 
+    # @TODO: hotfix - pie chart do not refreshes automatically
+    fig.update_layout(autosize=False, height=450)
+    fig_with_without_count.update_layout(autosize=False, height=450)
+    pie_resolution.update_layout(autosize=False, height=450)
+
     fields = [
         {
             "field": "data.avgAreaCount",
@@ -238,10 +243,6 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
         {
             "field": "data.imageWithClassCount",
             "payload": json.loads(fig_with_without_count.to_json())
-        },
-        {
-            "field": "data.resolutionsCount",
-            "payload": json.loads(pie_resolution.to_json())
         },
         {
             "field": "data.resolutionsCount",
@@ -258,22 +259,6 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
         {
             "field": "data.loading3",
             "payload": False
-        }
-    ]
-    api.task.set_fields(task_id, fields)
-
-    #@TODO: hotfix - pie chart do not refreshes automatically
-    fields = [
-        {
-            "field": "data.resolutionsCount",
-            "payload": json.loads(pie_resolution.to_json())
-        }
-    ]
-    api.task.set_fields(task_id, fields)
-    fields = [
-        {
-            "field": "data.resolutionsCount",
-            "payload": json.loads(pie_resolution.to_json())
         }
     ]
     api.task.set_fields(task_id, fields)

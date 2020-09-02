@@ -1,7 +1,7 @@
 <div>
     <h3>Report for project "{{ data.projectName }}" (id={{ data.projectId  }}) </h3>
-    <card v-if="data.progress !== 100"> <el-progress :percentage="data.progress"></el-progress> </card>
-    <card title="Classes area/count"
+    <sly-card v-if="data.progress !== 100"> <el-progress :percentage="data.progress"></el-progress> </sly-card>
+    <sly-card title="Classes area/count"
           subtitle="Detailed classes statistics for every image"
           style="margin-top: 15px;">
         <div slot="header" style="color:#20a0ff">
@@ -9,9 +9,9 @@
             <i class="zmdi zmdi-equalizer"></i> - number of objects
         </div>
         <sly-table :options="{ perPage: state.perPage, pageSizes: state.pageSizes}" :content="data.table"></sly-table>
-    </card>
+    </sly-card>
 
-    <card title="Average class area/count (only non-zero values)"
+    <sly-card title="Average class area/count (only non-zero values)"
           subtitle="Average class area and objects count only for images with this class
                     (i.e. if class is not presented on image - this image will not be taken into account in stats)"
           style="height:100%; margin-top: 15px;">
@@ -19,23 +19,23 @@
                     element-loading-text="Will be calculated after the per image stats table"
                     :content="data.avgAreaCount" >
         </sly-plotly>
-    </card>
+    </sly-card>
 
-    <card title="Number of images with/without specific class"
+    <sly-card title="Number of images with/without specific class"
           subtitle="For every class two values are calculated: how many images have / don't have a specific class"
           style="height:100%; margin-top: 15px;">
         <sly-plotly v-loading="data.loading2"
                     element-loading-text="Will be calculated after the per image stats table"
                     :content="data.imageWithClassCount" >
         </sly-plotly>
-    </card>
+    </sly-card>
 
-    <card title="Images resolutions (height x width x channels)"
+    <sly-card title="Images resolutions (height x width x channels)"
           subtitle="Image resolutions distribution"
           style="height:100%; margin-top: 15px;">
         <sly-plotly v-loading="data.loading3"
                     element-loading-text="Will be calculated after the per image stats table"
                     :content="data.resolutionsCount" >
         </sly-plotly>
-    </card>
+    </sly-card>
 </div>
