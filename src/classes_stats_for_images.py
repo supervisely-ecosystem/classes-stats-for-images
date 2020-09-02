@@ -5,8 +5,6 @@ from collections import defaultdict
 import pandas as pd
 import json
 import numpy as np
-# <!--    <sly-notification content="<Текст нотификации в маркдауне>" :options="{ type: 'note|info|warning|error', name: '<заголовок нотификации>'}" />-->
-
 
 my_app = sly.AppService()
 
@@ -16,15 +14,14 @@ PROJECT_ID = os.environ.get('modal.state.inputProjectId', None)
 DATASET_ID = os.environ.get('modal.state.inputDatasetId', None)
 SAMPLE_PERCENT = int(os.environ['modal.state.samplePercent'])
 BG_COLOR = [0, 0, 0]
-BATCH_SIZE = 1
+BATCH_SIZE = 15
 
 progress = 0
 
 
 def _col_name(name, color, icon):
-    return '<b style="display: inline-block; border-radius: 50%; ' \
-           'background: {}; width: 8px; height: 8px"></b> {} ' \
-           ' <i class="zmdi {}" style="color:{};margin-right:3px"></i>'.format(color, name, icon, color)
+    hexcolor=sly.color.rgb2hex(color)
+    return '<div style="color:{}"><i class="zmdi {}" style="margin-right:3px"></i> {} </div>'.format(hexcolor, icon, name)
 
 
 def get_col_name_area(name, color):
@@ -56,9 +53,8 @@ def sample_images(api, datasets):
 #     for class_name in class_names:
 
 
-
-@sly.timeit
 @my_app.callback("calc")
+@sly.timeit
 def calc(api: sly.Api, task_id, context, state, app_logger):
     global progress
 
@@ -83,7 +79,7 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     class_colors = [[0, 0, 0]]
     class_indices_colors = [[0, 0, 0]]
     _name_to_index = {}
-    table_columns = ["id", "dataset", "name", "height", "width", "channels", "unlabeled"]
+    table_columns = ["id", "dataset", "image", "height", "width", "channels", "unlabeled"]
     for idx, obj_class in enumerate(meta.obj_classes):
         class_names.append(obj_class.name)
         class_colors.append(obj_class.color)
@@ -125,8 +121,8 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
                 for class_name in class_names:
                     if class_name == "unlabeled":
                         continue
-                    table_row.append(stat_area[class_name])
-                    table_row.append(stat_count[class_name])
+                    table_row.append(round(stat_area[class_name], 2))
+                    table_row.append(round(stat_count[class_name], 2))
 
                 if len(table_row) != len(table_columns):
                     raise RuntimeError("Values for some columns are missed")
@@ -135,30 +131,19 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
             all_stats.extend(batch_stats)
 
             progress += len(batch_stats)
-            payload = {
-                "progress": int(progress * 100 / sample_count),
-                "table": {
-                    "data": batch_stats,
-                    "data2": [1, 2, 3]
+
+            fields = [
+                {
+                    "field": "data.progress",
+                    "payload": int(progress * 100 / sample_count)
+                },
+                {
+                    "field": "data.table.data",
+                    "payload": batch_stats,
+                    "append": True
                 }
-            }
-
-            # from supervisely_lib.io.json import flatten_json, modify_keys
-            # modal_envs = flatten_json(modal_state)
-            # modal_envs = modify_keys(modal_envs, prefix="modal.state.")
-
-            # fields = {
-            #     "progress": int(progress * 100 / sample_count),
-            #     "table": {
-            #         "data": batch_stats,
-            #         "data2": [1, 2, 3]
-            #     }
-            # }
-            #
-            #
-            # api.task.set_field(task_id, "data.progress", payload)
-            # api.task.set_field(task_id, "data.table", payload, append=True, recursive=True)
-
+            ]
+            api.task.set_fields(task_id, fields)
             task_progress.iters_done_report(len(batch_stats))
 
 
@@ -168,27 +153,8 @@ def main():
                                                "samplePercent": SAMPLE_PERCENT})
 
     api = sly.Api.from_env()
-    # df = pd.DataFrame(
-    #     [["a", "b"], ["c", "d"]],
-    #     index=["row 1", "row 2"],
-    #     columns=["col 1", "col 2"],
-    # )
-    # print(json.dumps(df.to_json(orient='split')))
 
     data = {
-        # "table": [
-        #     {"a": 1, "b": 10},
-        #     {"a": 2, "b": 20},
-        #     {"a": 3, "b": 30},
-        # ],
-        # "table": {
-        #     "columns": ["b", "a"],
-        #     "data": [
-        #         [1, 10],
-        #         [2, 20],
-        #         [3, 30],
-        #     ]
-        # },
         "table": {
             "columns": [],
             "data": []
@@ -198,8 +164,8 @@ def main():
 
     state = {
         "test": 12,
-        "perPage": 20,
-        "pageSizes": [5, 10, 30, 50, 100],
+        "perPage": 10,
+        "pageSizes": [10, 15, 30, 50, 100],
     }
 
     initial_events = [
@@ -209,8 +175,6 @@ def main():
             "command": "calc",
         }
     ]
-    #initial_events = []
-
 
     # Run application service
     my_app.run(data=data, state=state, initial_events=initial_events)
@@ -221,7 +185,7 @@ if __name__ == "__main__":
 
 
 
-# Area:
+# Icons:
 # <i class="zmdi zmdi-time-interval"></i>
 # <i class="zmdi zmdi-format-color-fill"></i>
 # Count
@@ -230,4 +194,5 @@ if __name__ == "__main__":
 # <i class="zmdi zmdi-equalizer"></i>
 # <i class="zmdi zmdi-chart"></i>
 
+#Pascal stats
 # #http://host.robots.ox.ac.uk/pascal/VOC/voc2012/dbstats.html
