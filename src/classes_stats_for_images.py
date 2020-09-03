@@ -10,10 +10,8 @@ import plotly.graph_objects as go
 
 my_app = sly.AppService()
 
-TEAM_ID = int(os.environ['modal.state.teamId'])
-WORKSPACE_ID = int(os.environ['modal.state.workspaceId'])
-PROJECT_ID = os.environ.get('modal.state.inputProjectId', None)
-DATASET_ID = os.environ.get('modal.state.inputDatasetId', None)
+PROJECT_ID = int(os.environ['modal.state.projectId'])
+DATASET_ID = os.environ.get('modal.state.datasetId', None)
 SAMPLE_PERCENT = int(os.environ['modal.state.samplePercent'])
 BG_COLOR = [0, 0, 0]
 BATCH_SIZE = 50
@@ -62,16 +60,14 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     global progress, sum_class_area_per_image, sum_class_count_per_image, count_images_with_class
 
     project = None
-    datasets = []
-    if PROJECT_ID is not None:
-        project = api.project.get_info_by_id(PROJECT_ID)
-        datasets = api.dataset.get_list(PROJECT_ID)
-    elif DATASET_ID is not None:
+    datasets = None
+    if DATASET_ID is not None:
         dataset = api.dataset.get_info_by_id(DATASET_ID)
         datasets = [dataset]
-        project = api.project.get_info_by_id(dataset.project_id)
-    else:
-        raise ValueError("Both project and dataset are not defined.")
+
+    project = api.project.get_info_by_id(PROJECT_ID)
+    if datasets is None:
+        datasets = api.dataset.get_list(PROJECT_ID)
 
     fields = [
         {
@@ -265,8 +261,7 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
 
 
 def main():
-    sly.logger.info("Script arguments", extra={"teamId: ": TEAM_ID, "workspaceId: ": WORKSPACE_ID,
-                                               "projectId": PROJECT_ID,"datasetId": DATASET_ID,
+    sly.logger.info("Script arguments", extra={"projectId": PROJECT_ID, "datasetId": DATASET_ID,
                                                "samplePercent": SAMPLE_PERCENT})
 
     api = sly.Api.from_env()
