@@ -116,6 +116,7 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     all_stats = []
     task_progress = sly.Progress("Stats", sample_count, app_logger)
     for dataset_id, images in ds_images.items():
+        dataset = api.dataset.get_info_by_id(dataset_id)
         for batch in sly.batched(images, batch_size=BATCH_SIZE):
             batch_stats = []
 
