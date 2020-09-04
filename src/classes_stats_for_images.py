@@ -133,6 +133,9 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
                 stat_area = sly.Annotation.stat_area(render_idx_rgb, class_names, class_indices_colors)
                 stat_count = ann.stat_class_count(class_names)
 
+                if stat_area["unlabeled"] > 0:
+                    stat_count["unlabeled"] = 1
+
                 table_row = []
                 table_row.append(info.id)
                 table_row.append(dataset.name)
