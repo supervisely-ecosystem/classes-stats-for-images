@@ -10,8 +10,10 @@ import plotly.graph_objects as go
 
 my_app = sly.AppService()
 
-PROJECT_ID = int(os.environ['modal.state.projectId'])
-DATASET_ID = os.environ.get('modal.state.datasetId', None)
+TEAM_ID = int(os.environ['context.teamId'])
+WORKSPACE_ID = int(os.environ['context.workspaceId'])
+PROJECT_ID = int(os.environ['modal.state.slyProjectId'])
+DATASET_ID = os.environ.get('modal.state.slyDatasetId', None)
 SAMPLE_PERCENT = int(os.environ['modal.state.samplePercent'])
 BG_COLOR = [0, 0, 0]
 BATCH_SIZE = 50
