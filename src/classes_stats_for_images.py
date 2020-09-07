@@ -95,7 +95,7 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     class_colors = [[0, 0, 0]]
     class_indices_colors = [[0, 0, 0]]
     _name_to_index = {}
-    table_columns = ["id", "dataset", "image", "height", "width", "channels", "unlabeled"]
+    table_columns = ["image id", "image", "dataset", "height", "width", "channels", "unlabeled"]
     for idx, obj_class in enumerate(meta.obj_classes):
         class_names.append(obj_class.name)
         class_colors.append(obj_class.color)
@@ -138,9 +138,9 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
 
                 table_row = []
                 table_row.append(info.id)
-                table_row.append(dataset.name)
                 table_row.append('<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>'
                                  .format(api.image.url(TEAM_ID, WORKSPACE_ID, project.id, dataset.id, info.id), info.name))
+                table_row.append(dataset.name)
                 table_row.extend([stat_area["height"],
                                   stat_area["width"],
                                   stat_area["channels"],
@@ -199,14 +199,18 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     images_with_count_text = []
     images_without_count_text = []
     for idx, class_name in enumerate(class_names):
-        if class_name == "unlabeled":
-            continue
+        #if class_name == "unlabeled":
+        #    continue
         with_count = count_images_with_class[idx]
         without_count = sample_count - with_count
         images_with_count.append(with_count)
         images_without_count.append(without_count)
         images_with_count_text.append("{} ({:.2f} %)".format(with_count, with_count * 100 / sample_count))
         images_without_count_text.append("{} ({:.2f} %)".format(without_count, without_count * 100 / sample_count))
+
+    if len(class_names) != len(images_with_count) or len(class_names) != len(images_with_count_text) or \
+        len(class_names) != len(images_without_count) or len(class_names) != len(images_without_count_text):
+        raise RuntimeError("Class names are inconsistent with images counting")
 
     fig_with_without_count = go.Figure(
         data=[
