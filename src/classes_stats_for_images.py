@@ -315,6 +315,10 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
             "field": "state.showDialog",
             "payload": True
         },
+        {
+            "field": "data.savePath",
+            "payload": remote_path
+        },
     ]
     api.task.set_fields(task_id, fields)
 
@@ -341,7 +345,7 @@ def main():
         "projectName": "",
         "projectId": "",
         "overviewTable": "",
-        "savePath": "/reports/abc.xxx"
+        "savePath": "..."
     }
 
     state = {

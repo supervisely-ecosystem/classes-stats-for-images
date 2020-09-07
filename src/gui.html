@@ -51,7 +51,7 @@
       :visible.sync="state.showDialog"
       size="tiny"
       title="Report was created">
-      <span>Report has been successfully created and saved to File Manager: {{data.savePath}} </span>
+      <span>Report has been successfully created and saved to file: <br> {{data.savePath}} </span>
       <span class="dialog-footer" slot="footer">
         <el-button @click="state.showDialog = false" type="primary">OK</el-button>
       </span>
