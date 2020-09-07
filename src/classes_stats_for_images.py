@@ -16,6 +16,7 @@ PROJECT_ID = int(os.environ['modal.state.slyProjectId'])
 DATASET_ID = os.environ.get('modal.state.slyDatasetId', None)
 if DATASET_ID is not None:
     DATASET_ID = int(DATASET_ID)
+USER_LOGIN = os.environ['context.userLogin']
 
 SAMPLE_PERCENT = int(os.environ['modal.state.samplePercent'])
 BG_COLOR = [0, 0, 0]
@@ -28,8 +29,14 @@ count_images_with_class = []
 resolutions_count = defaultdict(int)
 
 
+def color_text(name, color):
+    hexcolor = sly.color.rgb2hex(color)
+    #<div style="color:{}">{}</div>
+    return '<div><b style="display: inline-block; border-radius: 50%; background: {}; width: 8px; height: 8px"></b> {} </div>'.format(hexcolor, name)
+
+
 def _col_name(name, color, icon):
-    hexcolor=sly.color.rgb2hex(color)
+    hexcolor = sly.color.rgb2hex(color)
     return '<div style="color:{}"><i class="zmdi {}" style="margin-right:3px"></i> {} </div>'.format(hexcolor, icon, name)
 
 
@@ -201,7 +208,7 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     for idx, class_name in enumerate(class_names):
         #if class_name == "unlabeled":
         #    continue
-        with_count = count_images_with_class[idx]
+        with_count = count_images_with_class[idx] - 1 if class_name == "unlabeled" else count_images_with_class[idx]
         without_count = sample_count - with_count
         images_with_count.append(with_count)
         images_without_count.append(without_count)
@@ -244,7 +251,33 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     fig_with_without_count.update_layout(autosize=False, height=450)
     pie_resolution.update_layout(autosize=False, height=450)
 
+    # save report to file *.lnk (link to report)
+    #path = "/reports/classes_stats/{}/{}_id_{}_{}.lnk".format(USER_LOGIN, project.name, project.id)
+    #api.user.get
+    #api.file.()
+
+    # overview table
+    overviewTable = {
+        "columns": ["#", "class name", "images count", "objects count", "avg area per image (%)", "avg count per image"],
+        "data": []
+    }
+    _overview_data = []
+    for idx, (class_name, class_color) in enumerate(zip(class_names, class_colors)):
+        row = [idx,
+               color_text(class_name, class_color),
+               count_images_with_class[idx] - 1 if class_name == "unlabeled" else count_images_with_class[idx],
+               sum_class_count_per_image[idx],
+               round(avg_nonzero_area[idx], 2),
+               round(avg_nonzero_count[idx], 2)
+        ]
+        _overview_data.append(row)
+    overviewTable["data"] = _overview_data
+
     fields = [
+        {
+            "field": "data.overviewTable",
+            "payload": overviewTable
+        },
         {
             "field": "data.avgAreaCount",
             "payload": json.loads(fig.to_json())
@@ -258,6 +291,10 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
             "payload": json.loads(pie_resolution.to_json())
         },
         {
+            "field": "data.loading0",
+            "payload": False
+        },
+        {
             "field": "data.loading1",
             "payload": False
         },
@@ -268,7 +305,11 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
         {
             "field": "data.loading3",
             "payload": False
-        }
+        },
+        {
+            "field": "state.showDialog",
+            "payload": True
+        },
     ]
     api.task.set_fields(task_id, fields)
 
@@ -285,6 +326,7 @@ def main():
             "data": []
         },
         "progress": progress,
+        "loading0": True,
         "loading1": True,
         "loading2": True,
         "loading3": True,
@@ -292,13 +334,16 @@ def main():
         "imageWithClassCount": json.loads(go.Figure().to_json()),
         "resolutionsCount": json.loads(go.Figure().to_json()),
         "projectName": "",
-        "projectId": ""
+        "projectId": "",
+        "overviewTable": "",
+        "savePath": "/reports/abc.xxx"
     }
 
     state = {
         "test": 12,
         "perPage": 10,
         "pageSizes": [10, 15, 30, 50, 100],
+        "showDialog": False
     }
 
     initial_events = [

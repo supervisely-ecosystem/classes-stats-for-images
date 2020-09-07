@@ -1,7 +1,7 @@
 <div>
     <h3>Report for project "{{ data.projectName }}" (id={{ data.projectId  }}) </h3>
     <sly-card v-if="data.progress !== 100"> <el-progress :percentage="data.progress"></el-progress> </sly-card>
-    <sly-card title="Classes area/count"
+    <sly-card title="Classes area and objects count per image"
           subtitle="Detailed classes statistics for every image"
           style="margin-top: 15px;">
         <div slot="header" style="color:#20a0ff">
@@ -13,7 +13,13 @@
         </sly-table>
     </sly-card>
 
-    <sly-card title="Average class area/count (only non-zero values)"
+    <sly-card title="Overview"
+          subtitle="Summary statistics for all classes"
+          style="margin-top: 15px;">
+        <sly-table v-loading="data.loading0" :content="data.overviewTable"> </sly-table>
+    </sly-card>
+
+    <sly-card title="Average class area / objects count (only non-zero values)"
           subtitle="Average class area and objects count only for images with this class
                     (i.e. if class is not presented on image - this image will not be taken into account in stats)"
           style="height:100%; margin-top: 15px;">
@@ -40,4 +46,14 @@
                     :content="data.resolutionsCount" >
         </sly-plotly>
     </sly-card>
+
+    <el-dialog
+      :visible.sync="state.showDialog"
+      size="tiny"
+      title="Report was created">
+      <span>Report has been successfully created and saved to File Manager: {{data.savePath}} </span>
+      <span class="dialog-footer" slot="footer">
+        <el-button @click="state.showDialog = false" type="primary">OK</el-button>
+      </span>
+    </el-dialog>
 </div>
