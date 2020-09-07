@@ -7,6 +7,7 @@ import json
 import numpy as np
 import plotly.graph_objects as go
 #import plotly.express as px
+import time
 
 my_app = sly.AppService()
 
@@ -251,11 +252,6 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     fig_with_without_count.update_layout(autosize=False, height=450)
     pie_resolution.update_layout(autosize=False, height=450)
 
-    # save report to file *.lnk (link to report)
-    #path = "/reports/classes_stats/{}/{}_id_{}_{}.lnk".format(USER_LOGIN, project.name, project.id)
-    #api.user.get
-    #api.file.()
-
     # overview table
     overviewTable = {
         "columns": ["#", "class name", "images count", "objects count", "avg area per image (%)", "avg count per image"],
@@ -272,6 +268,15 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
         ]
         _overview_data.append(row)
     overviewTable["data"] = _overview_data
+
+    # save report to file *.lnk (link to report)
+    report_name = "{}_{}_(id_{}).lnk".format(time.strftime("%Y-%m-%d-%H:%M:%S"), project.name, project.id)
+    local_path = os.path.join(my_app.data_dir, report_name)
+    sly.fs.ensure_base_path(local_path)
+    with open(local_path, "w") as text_file:
+        print(my_app.app_url, file=text_file)
+    remote_path = "/reports/classes_stats/{}/{}".format(USER_LOGIN, report_name)
+    api.file.upload(TEAM_ID, local_path, remote_path)
 
     fields = [
         {
