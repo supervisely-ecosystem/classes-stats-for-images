@@ -29,6 +29,8 @@ sum_class_count_per_image = []
 count_images_with_class = []
 resolutions_count = defaultdict(int)
 
+overview_columns = ["#", "class name", "images count", "objects count", "avg class area per image (%)", "avg objects count per image"]
+
 
 def color_text(name, color):
     hexcolor = sly.color.rgb2hex(color)
@@ -254,7 +256,7 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
 
     # overview table
     overviewTable = {
-        "columns": ["#", "class name", "images count", "objects count", "avg area per image (%)", "avg count per image"],
+        "columns": overview_columns,
         "data": []
     }
     _overview_data = []
@@ -344,7 +346,10 @@ def main():
         "resolutionsCount": json.loads(go.Figure().to_json()),
         "projectName": "",
         "projectId": "",
-        "overviewTable": "",
+        "overviewTable": {
+            "columns": overview_columns,
+            "data": []
+        },
         "savePath": "..."
     }
 

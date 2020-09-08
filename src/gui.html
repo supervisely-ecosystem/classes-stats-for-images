@@ -15,8 +15,11 @@
 
     <sly-card title="Overview"
           subtitle="Summary statistics for all classes"
-          style="margin-top: 15px;">
-        <sly-table v-loading="data.loading0" :content="data.overviewTable"> </sly-table>
+          style="margin-top: 15px; min-height: 200px;">
+        <sly-table v-loading="data.loading0"
+                   element-loading-text="Will be calculated after the per image stats table"
+                   :content="data.overviewTable">
+        </sly-table>
     </sly-card>
 
     <sly-card title="Average class area / objects count (only non-zero values)"
