@@ -40,7 +40,7 @@ def color_text(name, color):
 
 def _col_name(name, color, icon):
     hexcolor = sly.color.rgb2hex(color)
-    return '<div style="color:{}"><i class="zmdi {}" style="margin-right:3px"></i> {} </div>'.format(hexcolor, icon, name)
+    return '<div><i class="zmdi {}" style=""style="color:{};margin-right:3px"></i> {}</div>'.format(icon, hexcolor, name)
 
 
 def get_col_name_area(name, color):
