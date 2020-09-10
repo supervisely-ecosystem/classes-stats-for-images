@@ -118,7 +118,7 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     sum_class_area_per_image = [0] * len(class_names)
     sum_class_count_per_image = [0] * len(class_names)
     count_images_with_class = [0] * len(class_names)
-    count_images_with_class[0] = 1  # for unlabeled
+    #count_images_with_class[0] = 1  # for unlabeled
 
     api.task.set_field(task_id, "data.table.columns", table_columns)
 
@@ -211,7 +211,7 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     for idx, class_name in enumerate(class_names):
         #if class_name == "unlabeled":
         #    continue
-        with_count = count_images_with_class[idx] - 1 if class_name == "unlabeled" else count_images_with_class[idx]
+        with_count = count_images_with_class[idx] #- 1 if class_name == "unlabeled" else count_images_with_class[idx]
         without_count = sample_count - with_count
         images_with_count.append(with_count)
         images_without_count.append(without_count)
@@ -263,7 +263,7 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     for idx, (class_name, class_color) in enumerate(zip(class_names, class_colors)):
         row = [idx,
                color_text(class_name, class_color),
-               count_images_with_class[idx] - 1 if class_name == "unlabeled" else count_images_with_class[idx],
+               count_images_with_class[idx], # - 1 if class_name == "unlabeled" else count_images_with_class[idx],
                sum_class_count_per_image[idx],
                round(avg_nonzero_area[idx], 2),
                round(avg_nonzero_count[idx], 2)
