@@ -6,7 +6,7 @@
     "images"
   ],
   "description": "Detailed statistics for all classes in images project",
-  "docker_image": "docker.deepsystems.io/supervisely/five/base-py-sdk-internal:app",
+  "docker_image": "docker.deepsystems.io/supervisely/five/base-py-sdk-internal:apps",
   "main_script": "src/classes_stats_for_images.py",
   "modal_template": "src/modal.html",
   "modal_template_state": {
