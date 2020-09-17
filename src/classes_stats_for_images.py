@@ -2,12 +2,11 @@ import os
 import supervisely_lib as sly
 import random
 from collections import defaultdict
-import pandas as pd
 import json
 import numpy as np
 import plotly.graph_objects as go
-#import plotly.express as px
 import time
+#np.seterr(divide='ignore')
 
 my_app = sly.AppService()
 
@@ -187,8 +186,13 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
             task_progress.iters_done_report(len(batch_stats))
 
     # average nonzero class area per image
-    avg_nonzero_area = np.divide(sum_class_area_per_image, count_images_with_class)
-    avg_nonzero_count = np.divide(sum_class_count_per_image, count_images_with_class)
+    with np.errstate(divide='ignore'):
+        avg_nonzero_area = np.divide(sum_class_area_per_image, count_images_with_class)
+        avg_nonzero_count = np.divide(sum_class_count_per_image, count_images_with_class)
+
+    avg_nonzero_area = np.where(np.isnan(avg_nonzero_area), None, avg_nonzero_area)
+    avg_nonzero_count = np.where(np.isnan(avg_nonzero_count), None, avg_nonzero_count)
+
     fig = go.Figure(
         data=[
             go.Bar(name='Area %', x=class_names, y=avg_nonzero_area, yaxis='y', offsetgroup=1),
@@ -265,8 +269,8 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
                color_text(class_name, class_color),
                count_images_with_class[idx], # - 1 if class_name == "unlabeled" else count_images_with_class[idx],
                sum_class_count_per_image[idx],
-               round(avg_nonzero_area[idx], 2),
-               round(avg_nonzero_count[idx], 2)
+               None if avg_nonzero_area[idx] is None else round(avg_nonzero_area[idx], 2),
+               None if avg_nonzero_count[idx] is None else round(avg_nonzero_count[idx], 2)
         ]
         _overview_data.append(row)
     overviewTable["data"] = _overview_data
