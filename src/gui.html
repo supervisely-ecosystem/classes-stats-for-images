@@ -10,7 +10,7 @@
       </el-col>
       <el-col :span="16" style="flex: 1">
           <sly-card title="Output" style="height: 100%">
-              <sly-field v-if="data.progress === 100" title="Report" :description="`${data.savePath}`">
+              <sly-field v-if="data.progress === 100" title="Report has been successfully saved" :description="`${data.savePath}`">
                    <sly-icon slot="icon" :options="{ color: '#33c94c', bgColor: '#d9f7e4', rounded: false }">
                        <i class="zmdi zmdi-receipt"></i>
                    </sly-icon>
