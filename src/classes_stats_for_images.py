@@ -167,15 +167,8 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
             progress += len(batch_stats)
 
             fields = [
-                {
-                    "field": "data.progress",
-                    "payload": int(progress * 100 / sample_count)
-                },
-                {
-                    "field": "data.table.data",
-                    "payload": batch_stats,
-                    "append": True
-                }
+                {"field": "data.progress", "payload": int(progress * 100 / sample_count)},
+                {"field": "data.table.data", "payload": batch_stats, "append": True}
             ]
             api.task.set_fields(task_id, fields)
             task_progress.iters_done_report(len(batch_stats))
@@ -280,46 +273,16 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     api.file.upload(TEAM_ID, local_path, remote_path)
 
     fields = [
-        {
-            "field": "data.overviewTable",
-            "payload": overviewTable
-        },
-        {
-            "field": "data.avgAreaCount",
-            "payload": json.loads(fig.to_json())
-        },
-        {
-            "field": "data.imageWithClassCount",
-            "payload": json.loads(fig_with_without_count.to_json())
-        },
-        {
-            "field": "data.resolutionsCount",
-            "payload": json.loads(pie_resolution.to_json())
-        },
-        {
-            "field": "data.loading0",
-            "payload": False
-        },
-        {
-            "field": "data.loading1",
-            "payload": False
-        },
-        {
-            "field": "data.loading2",
-            "payload": False
-        },
-        {
-            "field": "data.loading3",
-            "payload": False
-        },
-        {
-            "field": "state.showDialog",
-            "payload": True
-        },
-        {
-            "field": "data.savePath",
-            "payload": remote_path
-        },
+        {"field": "data.overviewTable", "payload": overviewTable},
+        {"field": "data.avgAreaCount", "payload": json.loads(fig.to_json())},
+        {"field": "data.imageWithClassCount", "payload": json.loads(fig_with_without_count.to_json())},
+        {"field": "data.resolutionsCount", "payload": json.loads(pie_resolution.to_json())},
+        {"field": "data.loading0", "payload": False},
+        {"field": "data.loading1", "payload": False},
+        {"field": "data.loading2", "payload": False},
+        {"field": "data.loading3", "payload": False},
+        {"field": "state.showDialog", "payload": True},
+        {"field": "data.savePath", "payload": remote_path},
     ]
     api.task.set_fields(task_id, fields)
 
@@ -360,21 +323,8 @@ def main():
         "showDialog": False
     }
 
-    initial_events = [
-        {
-            "state": None,
-            "context": None,
-            "command": "calc",
-        },
-        {
-            "state": None,
-            "context": None,
-            "command": "stop",
-        }
-    ]
-
     # Run application service
-    my_app.run(data=data, state=state, initial_events=initial_events)
+    my_app.run(data=data, state=state, initial_events=[{"command": "calc"}, {"command": "stop"}])
     my_app.wait_all()
 
 

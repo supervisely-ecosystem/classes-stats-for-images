@@ -1,7 +1,4 @@
 <div>
-<!--    <h3>Report for project "{{ data.projectName }}" (id={{ data.projectId  }}) </h3>-->
-
-
     <el-row :gutter="20" type="flex">
       <el-col :span="12">
           <sly-card title="Input">
@@ -71,14 +68,4 @@
                     :content="data.resolutionsCount" >
         </sly-plotly>
     </sly-card>
-
-    <el-dialog
-      :visible.sync="state.showDialog"
-      size="tiny"
-      title="Report was created">
-      <span>Report has been successfully created and saved to file: <br> {{data.savePath}} </span>
-      <span class="dialog-footer" slot="footer">
-        <el-button @click="state.showDialog = false" type="primary">OK</el-button>
-      </span>
-    </el-dialog>
 </div>
