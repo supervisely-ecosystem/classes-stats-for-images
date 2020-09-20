@@ -84,14 +84,9 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
         datasets = api.dataset.get_list(PROJECT_ID)
 
     fields = [
-        {
-            "field": "data.projectName",
-            "payload": project.name
-        },
-        {
-            "field": "data.projectId",
-            "payload": project.id,
-        }
+        {"field": "data.projectName", "payload": project.name},
+        {"field": "data.projectId", "payload": project.id},
+        {"field": "data.projectPreviewUrl", "payload": api.image.preview_url(project.reference_image_url, 100, 100)}
     ]
     api.task.set_fields(task_id, fields)
 
@@ -350,6 +345,7 @@ def main():
         "resolutionsCount": json.loads(go.Figure().to_json()),
         "projectName": "",
         "projectId": "",
+        "projectPreviewUrl": "",
         "overviewTable": {
             "columns": overview_columns,
             "data": []
