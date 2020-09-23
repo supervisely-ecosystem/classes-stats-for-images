@@ -73,6 +73,7 @@ def sample_images(api, datasets):
 def calc(api: sly.Api, task_id, context, state, app_logger):
     global progress, sum_class_area_per_image, sum_class_count_per_image, count_images_with_class
 
+    workspace = api.workspace.get_info_by_id(WORKSPACE_ID)
     project = None
     datasets = None
     if DATASET_ID is not None:
@@ -264,13 +265,14 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     overviewTable["data"] = _overview_data
 
     # save report to file *.lnk (link to report)
-    report_name = "{}_{}_(id_{}).lnk".format(time.strftime("%Y-%m-%d-%H:%M:%S"), project.name, project.id)
+    report_name = "{}.lnk".format(project.name)
     local_path = os.path.join(my_app.data_dir, report_name)
     sly.fs.ensure_base_path(local_path)
     with open(local_path, "w") as text_file:
         print(my_app.app_url, file=text_file)
-    remote_path = "/reports/classes_stats/{}/{}".format(USER_LOGIN, report_name)
-    api.file.upload(TEAM_ID, local_path, remote_path)
+    remote_path = "/reports/classes_stats/{}/{}/{}".format(USER_LOGIN, workspace.name, report_name)
+    remote_path = api.file.get_free_name(TEAM_ID, remote_path)
+    file_info = api.file.upload(TEAM_ID, local_path, remote_path)
 
     fields = [
         {"field": "data.overviewTable", "payload": overviewTable},
@@ -285,6 +287,7 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.savePath", "payload": remote_path},
     ]
     api.task.set_fields(task_id, fields)
+    api.task.set_output_report(task_id, file_info["id"], report_name)
 
 
 def main():
