@@ -18,7 +18,7 @@
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/supervisely-ecosystem/classes-stats-for-images)
 
 
-[![views](https://dev.supervise.ly/public/api/v3/ecosystem.counters?repo=supervisely-ecosystem/classes-stats-for-images&counter=Views)](https://supervise.ly)
+[![views](https://dev.supervise.ly/public/api/v3/ecosystem.counters?repo=supervisely-ecosystem/classes-stats-for-images&counter=views&label=views)](https://supervise.ly)
 [![used by teams](https://dev.supervise.ly/public/api/v3/ecosystem.counters?repo=supervisely-ecosystem/classes-stats-for-images&counter=runs&label=used%20by%20teams)](https://supervise.ly)
 [![runs](https://dev.supervise.ly/public/api/v3/ecosystem.counters?repo=supervisely-ecosystem/classes-stats-for-images&counter=downloads&label=runs)](https://supervise.ly)
 
