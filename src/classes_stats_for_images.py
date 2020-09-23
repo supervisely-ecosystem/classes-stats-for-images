@@ -2,12 +2,11 @@ import os
 import supervisely_lib as sly
 import random
 from collections import defaultdict
-import pandas as pd
 import json
 import numpy as np
 import plotly.graph_objects as go
-#import plotly.express as px
 import time
+#np.seterr(divide='ignore')
 
 my_app = sly.AppService()
 
@@ -85,14 +84,9 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
         datasets = api.dataset.get_list(PROJECT_ID)
 
     fields = [
-        {
-            "field": "data.projectName",
-            "payload": project.name
-        },
-        {
-            "field": "data.projectId",
-            "payload": project.id,
-        }
+        {"field": "data.projectName", "payload": project.name},
+        {"field": "data.projectId", "payload": project.id},
+        {"field": "data.projectPreviewUrl", "payload": api.image.preview_url(project.reference_image_url, 100, 100)}
     ]
     api.task.set_fields(task_id, fields)
 
@@ -173,22 +167,20 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
             progress += len(batch_stats)
 
             fields = [
-                {
-                    "field": "data.progress",
-                    "payload": int(progress * 100 / sample_count)
-                },
-                {
-                    "field": "data.table.data",
-                    "payload": batch_stats,
-                    "append": True
-                }
+                {"field": "data.progress", "payload": int(progress * 100 / sample_count)},
+                {"field": "data.table.data", "payload": batch_stats, "append": True}
             ]
             api.task.set_fields(task_id, fields)
             task_progress.iters_done_report(len(batch_stats))
 
     # average nonzero class area per image
-    avg_nonzero_area = np.divide(sum_class_area_per_image, count_images_with_class)
-    avg_nonzero_count = np.divide(sum_class_count_per_image, count_images_with_class)
+    with np.errstate(divide='ignore'):
+        avg_nonzero_area = np.divide(sum_class_area_per_image, count_images_with_class)
+        avg_nonzero_count = np.divide(sum_class_count_per_image, count_images_with_class)
+
+    avg_nonzero_area = np.where(np.isnan(avg_nonzero_area), None, avg_nonzero_area)
+    avg_nonzero_count = np.where(np.isnan(avg_nonzero_count), None, avg_nonzero_count)
+
     fig = go.Figure(
         data=[
             go.Bar(name='Area %', x=class_names, y=avg_nonzero_area, yaxis='y', offsetgroup=1),
@@ -265,8 +257,8 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
                color_text(class_name, class_color),
                count_images_with_class[idx], # - 1 if class_name == "unlabeled" else count_images_with_class[idx],
                sum_class_count_per_image[idx],
-               round(avg_nonzero_area[idx], 2),
-               round(avg_nonzero_count[idx], 2)
+               None if avg_nonzero_area[idx] is None else round(avg_nonzero_area[idx], 2),
+               None if avg_nonzero_count[idx] is None else round(avg_nonzero_count[idx], 2)
         ]
         _overview_data.append(row)
     overviewTable["data"] = _overview_data
@@ -281,46 +273,16 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     api.file.upload(TEAM_ID, local_path, remote_path)
 
     fields = [
-        {
-            "field": "data.overviewTable",
-            "payload": overviewTable
-        },
-        {
-            "field": "data.avgAreaCount",
-            "payload": json.loads(fig.to_json())
-        },
-        {
-            "field": "data.imageWithClassCount",
-            "payload": json.loads(fig_with_without_count.to_json())
-        },
-        {
-            "field": "data.resolutionsCount",
-            "payload": json.loads(pie_resolution.to_json())
-        },
-        {
-            "field": "data.loading0",
-            "payload": False
-        },
-        {
-            "field": "data.loading1",
-            "payload": False
-        },
-        {
-            "field": "data.loading2",
-            "payload": False
-        },
-        {
-            "field": "data.loading3",
-            "payload": False
-        },
-        {
-            "field": "state.showDialog",
-            "payload": True
-        },
-        {
-            "field": "data.savePath",
-            "payload": remote_path
-        },
+        {"field": "data.overviewTable", "payload": overviewTable},
+        {"field": "data.avgAreaCount", "payload": json.loads(fig.to_json())},
+        {"field": "data.imageWithClassCount", "payload": json.loads(fig_with_without_count.to_json())},
+        {"field": "data.resolutionsCount", "payload": json.loads(pie_resolution.to_json())},
+        {"field": "data.loading0", "payload": False},
+        {"field": "data.loading1", "payload": False},
+        {"field": "data.loading2", "payload": False},
+        {"field": "data.loading3", "payload": False},
+        {"field": "state.showDialog", "payload": True},
+        {"field": "data.savePath", "payload": remote_path},
     ]
     api.task.set_fields(task_id, fields)
 
@@ -346,6 +308,7 @@ def main():
         "resolutionsCount": json.loads(go.Figure().to_json()),
         "projectName": "",
         "projectId": "",
+        "projectPreviewUrl": "",
         "overviewTable": {
             "columns": overview_columns,
             "data": []
@@ -360,21 +323,8 @@ def main():
         "showDialog": False
     }
 
-    initial_events = [
-        {
-            "state": None,
-            "context": None,
-            "command": "calc",
-        },
-        {
-            "state": None,
-            "context": None,
-            "command": "stop",
-        }
-    ]
-
     # Run application service
-    my_app.run(data=data, state=state, initial_events=initial_events)
+    my_app.run(data=data, state=state, initial_events=[{"command": "calc"}, {"command": "stop"}])
     my_app.wait_all()
 
 
