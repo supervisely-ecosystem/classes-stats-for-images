@@ -285,6 +285,7 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.loading3", "payload": False},
         {"field": "state.showDialog", "payload": True},
         {"field": "data.savePath", "payload": remote_path},
+        {"field": "data.reportName", "payload": report_name},
     ]
     api.task.set_fields(task_id, fields)
     api.task.set_output_report(task_id, file_info["id"], report_name)
@@ -316,7 +317,8 @@ def main():
             "columns": overview_columns,
             "data": []
         },
-        "savePath": "..."
+        "savePath": "...",
+        "reportName": "..."
     }
 
     state = {
