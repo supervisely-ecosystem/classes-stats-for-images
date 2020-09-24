@@ -10,7 +10,6 @@
 
   <a href="#overview">Overview</a> •
   <a href="#description">Description</a> •
-  <a href="#installation">Installation</a> •
   <a href="#how-to-use">How to use</a>
 </p>
 
