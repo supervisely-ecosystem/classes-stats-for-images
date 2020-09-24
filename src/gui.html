@@ -12,7 +12,7 @@
         <el-col :span="16" style="flex: 1">
             <sly-card title="Output" style="height: 100%">
                 <sly-field v-if="data.progress === 100" title="" description="Report has been successfully saved to Files">
-                    <a slot="title" target="_blank" :href="`${data.savePath}`">{{data.reportName}}</a>
+                    <a slot="title" target="_blank" :href="`${data.reportUrl}`">{{data.reportName}}</a>
                     <sly-icon slot="icon" :options="{ color: '#33c94c', bgColor: '#d9f7e4', rounded: false }">
                         <i class="zmdi zmdi-receipt"></i>
                     </sly-icon>

@@ -274,6 +274,7 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     remote_path = api.file.get_free_name(TEAM_ID, remote_path)
     report_name = sly.fs.get_file_name_with_ext(remote_path)
     file_info = api.file.upload(TEAM_ID, local_path, remote_path)
+    report_url = api.file.get_url(file_info["id"])
 
     fields = [
         {"field": "data.overviewTable", "payload": overviewTable},
@@ -287,6 +288,7 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
         {"field": "state.showDialog", "payload": True},
         {"field": "data.savePath", "payload": remote_path},
         {"field": "data.reportName", "payload": report_name},
+        {"field": "data.reportUrl", "payload": report_url},
     ]
     api.task.set_fields(task_id, fields)
     api.task.set_output_report(task_id, file_info["id"], report_name)
