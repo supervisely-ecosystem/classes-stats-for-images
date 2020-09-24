@@ -9,7 +9,6 @@
 <p align="center">
 
   <a href="#overview">Overview</a> •
-  <a href="#description">Description</a> •
   <a href="#how-to-use">How to use</a>
 </p>
 
@@ -28,9 +27,6 @@ Data Exploration for Segmentation and Detection tasks is underestimated by many 
 
 This app generates report with detailed general and per image statistics for all classes in images project. It allows to see big picture as well as shed light on hidden patterns and edge cases (see <a href="#how-to-use">How to use</a> section).
 
-## Description
-
-ppp
 
 ## How to use
 
