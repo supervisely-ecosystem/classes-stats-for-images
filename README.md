@@ -24,4 +24,6 @@
 </div>
 
 ## Overview 
-Report gives detailed statistics for all classes in images project
+Data Exploration for Segmentation and Detection tasks is underestimated by many researchers. The accuracy of your models highly depends on how good you understand data. 
+
+This app generates report with detailed general and per image statistics for all classes in images project.
