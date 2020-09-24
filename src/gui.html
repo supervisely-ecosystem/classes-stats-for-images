@@ -43,9 +43,9 @@
         </sly-table>
     </sly-card>
 
-    <sly-card title="Average class area / objects count (only non-zero values)"
-              subtitle="Average class area and objects count only for images with this class
-                    (i.e. if class is not presented on image - this image will not be taken into account in stats)"
+    <sly-card title="Average class area / objects count"
+              subtitle="Histogram by class of the average class area and objects count (only for images that contain at least one object of
+the corresponding class)"
               style="height:100%; margin-top: 15px;">
         <sly-plotly v-loading="data.loading1"
                     element-loading-text="Will be calculated after the per image stats table"
