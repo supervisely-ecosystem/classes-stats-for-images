@@ -292,6 +292,7 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     ]
     api.task.set_fields(task_id, fields)
     api.task.set_output_report(task_id, file_info["id"], report_name)
+    my_app.stop()
 
 
 def main():
@@ -332,7 +333,8 @@ def main():
     }
 
     # Run application service
-    my_app.run(data=data, state=state, initial_events=[{"command": "calc"}, {"command": "stop"}])
+    #my_app.run(data=data, state=state, initial_events=[{"command": "calc"}, {"command": "stop"}])
+    my_app.run(data=data, state=state, initial_events=[{"command": "calc"}])
     my_app.wait_all()
 
 
