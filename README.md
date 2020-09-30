@@ -1,9 +1,6 @@
 <div align="center" markdown> 
 
-<img src="https://i.imgur.com/cISE5uw.png"/>
-
-
-# Clases stats for images
+# Clases Stats for Images
 
 <p align="center">
 
@@ -20,6 +17,9 @@
 </div>
 
 ## Overview 
+
+<img src="https://i.imgur.com/cISE5uw.png"/>
+
 Data Exploration for Segmentation and Detection tasks is underestimated by many researchers. The accuracy of your models highly depends on how good you understand data. 
 
 This app generates report with detailed general and per image statistics for all classes in images project. It allows to see big picture as well as shed light on hidden patterns and edge cases (see <a href="#how-to-use">How to use</a> section).
