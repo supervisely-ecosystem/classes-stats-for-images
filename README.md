@@ -3,7 +3,7 @@
 <img src="https://i.imgur.com/cISE5uw.png"/>
 
 
-# 
+# Clases stats for images
 
 <p align="center">
 
