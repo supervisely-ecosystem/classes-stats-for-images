@@ -25,7 +25,7 @@ Data Exploration for Segmentation and Detection tasks is underestimated by many 
 This app **"Classes Stats for Images"** generates report with detailed general and per image statistics for all classes in images project. It allows to see big picture as well as shed light on hidden patterns and edge cases (see <a href="#how-to-use">How to use</a> section).
 
 
-## How To Use
+## How To Run
 
 ### Run from context menu of project / dataset
 
@@ -42,3 +42,6 @@ Choose the percentage of images that should be randomly sampled. By default all 
 Once app is started, new task appear in workspace tasks. Monitor progress from both "Tasks" list and from application page. To open report in a new tab click "Open" button. 
 
 App saves resulting report to "Files": `/reports/classes_stats/{USER_LOGIN}/{WORKSPACE_NAME}/{PROJECT_NAME}.lnk`. To open report file in future use "Right mouse click" -> "Open".
+
+### Explanation
+dsfsdf
