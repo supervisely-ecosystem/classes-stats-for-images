@@ -7,7 +7,8 @@
 <p align="center">
 
   <a href="#overview">Overview</a> •
-  <a href="#how-to-use">How To Use</a>
+  <a href="#How-To-Run">How To Run</a> •
+  <a href="#Explanation">Explanation</a>
 </p>
 
 [![](https://img.shields.io/badge/slack-chat-green.svg?logo=slack)](https://supervise.ly/slack) 
