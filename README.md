@@ -27,9 +27,15 @@ This app **"Classes Stats for Images"** generates report with detailed general a
 
 ## How To Use
 
-
-### Run from contet menu of project / dataset
+### Run from context menu of project / dataset
 
 Go to "Context Menu" (images project or dataset) -> "Report" -> "Classes stats for images"
 
 <img src="https://i.imgur.com/dGGzVsm.png" width="600"/>
+
+### Sample data (Optional)
+
+Choose the percentage of images that should be randomly sampled. By default all images will be used. 
+
+
+###
