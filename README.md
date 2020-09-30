@@ -32,7 +32,7 @@ This app **"Classes Stats for Images"** generates report with detailed general a
 
 Go to "Context Menu" -> ""
 
-<img src="https://i.imgur.com/dGGzVsm.png" width="500"/>
+<img src="https://i.imgur.com/dGGzVsm.png" width="600"/>
 
 sasdad
 To run the app go to context menu of "IMAGES" project or dataset. 
