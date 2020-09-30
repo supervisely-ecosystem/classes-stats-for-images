@@ -96,4 +96,6 @@ Histogram view for two metrics from previous chapter: `AVG CLASS AREA PER IMAGE 
 
 <img src="https://i.imgur.com/veerIHk.png"/>
 
+### TOP-10 image resolutions
 
+<img src="https://i.imgur.com/UwrkTBf.png"/>
