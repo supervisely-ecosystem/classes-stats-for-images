@@ -58,6 +58,6 @@ Fields:
 * `HEIGHT`, `WIDTH` - image resolution in pixels
 * `CHANNELS` - number of image channels
 * `UNLABELED` - percentage of pixels (image area)
-* <img src="https://i.imgur.com/tyDf3qi.png"/> - fdsdfsdf
-* <img src="https://i.imgur.com/1EquheL.png"/> - sdfsdfsdf
+* <img src="https://i.imgur.com/tyDf3qi.png" width="100"/> - fdsdfsdf
+* <img src="https://i.imgur.com/1EquheL.png" width="100"/> - sdfsdfsdf
 * dfsfsf
