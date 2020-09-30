@@ -91,3 +91,9 @@ Columns for every class:
 <img src="https://i.imgur.com/6LXoXHH.png"/>
 
 Histogram view for two metrics from previous chapter: `AVG CLASS AREA PER IMAGE (%)` and `AVG OBJECTS COUNT PER IMAGE (%)`
+
+### IMAGES COUNT WITH / WITHOUT CLASS
+
+<img src="https://i.imgur.com/veerIHk.png"/>
+
+
