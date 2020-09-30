@@ -86,4 +86,6 @@ Columns for every class:
  the number of images with at least one object of a given class 
 ```
 
+### Histogram: AVG AREA / AVG OBJECTS COUNT
+
 
