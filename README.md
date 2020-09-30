@@ -71,18 +71,12 @@ Columns for every class:
 * `CLASS NAME`
 * `IMAGES COUNT` - total number of images that have at least one object of a given class
 * `OBJECTS COUNT` - total number of objects of a given class
-* `AVG CLASS AREA PER IMAGE (%)` - 
+* `AVG CLASS AREA PER IMAGE (%)` -
 
-                                    the sum of a class area on all images
-* `AVG CLASS AREA PER IMAGE (%)` -  --------------------------------------------------------------
-                                    the number of images with at least one object of a given class
-                                    
 ```
               the sum of a class area on all images               
  -------------------------------------------------------------- 
  the number of images with at least one object of a given class 
-
-
 ```
  
 * `AVG OBJECTS COUNT PER IMAGE (%)` - 
