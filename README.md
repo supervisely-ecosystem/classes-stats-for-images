@@ -1,9 +1,5 @@
 <div align="center" markdown> 
 
-<img src="https://i.imgur.com/UdBujFN.png" width="250" /> <br>
-
-<img src="https://img.icons8.com/fluent/96/000000/combo-chart.png" width="100"/> 
-
 <img src="https://i.imgur.com/cISE5uw.png"/>
 
 
