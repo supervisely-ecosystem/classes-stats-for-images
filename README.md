@@ -27,17 +27,17 @@ This app **"Classes Stats for Images"** generates report with detailed general a
 
 ## How To Run
 
-### Run from context menu of project / dataset
+### Step 1: Run from context menu of project / dataset
 
 Go to "Context Menu" (images project or dataset) -> "Report" -> "Classes stats for images"
 
 <img src="https://i.imgur.com/dGGzVsm.png" width="600"/>
 
-### Configure running settings
+### Step 2: Configure running settings
 
 Choose the percentage of images that should be randomly sampled. By default all images will be used. And then press "Run" button. In advanced settings you can change agent that will host the app and change version (latest available version is used by default).
 
-### Open app
+### Step 3:  Open app
 
 Once app is started, new task appear in workspace tasks. Monitor progress from both "Tasks" list and from application page. To open report in a new tab click "Open" button. 
 
