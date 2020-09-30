@@ -4,6 +4,9 @@
 
 <img src="https://img.icons8.com/fluent/96/000000/combo-chart.png" width="100"/> 
 
+<img src="https://i.imgur.com/cISE5uw.png"/>
+
+
 # Classes Stats for Images  
 
 <p align="center">
