@@ -63,3 +63,7 @@ Columns:
 Columns for every class:
 * <img src="https://i.imgur.com/tyDf3qi.png" width="100"/> - class area (%)
 * <img src="https://i.imgur.com/1EquheL.png" width="100"/> - number of objects of a given class (%)
+
+### Per class stats
+
+
