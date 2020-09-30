@@ -1,5 +1,7 @@
 <div align="center" markdown> 
 
+<img src="https://i.imgur.com/cISE5uw.png"/>
+  
 # Clases Stats for Images
 
 <p align="center">
@@ -17,8 +19,6 @@
 </div>
 
 ## Overview 
-
-<img src="https://i.imgur.com/cISE5uw.png"/>
 
 Data Exploration for Segmentation and Detection tasks is underestimated by many researchers. The accuracy of your models highly depends on how good you understand data. 
 
