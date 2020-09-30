@@ -88,4 +88,6 @@ Columns for every class:
 
 ### Histogram: AVG AREA / AVG OBJECTS COUNT
 
+<img src="https://i.imgur.com/6LXoXHH.png"/>
 
+Histogram view for two metrics from previous chapter: `AVG CLASS AREA PER IMAGE (%)` and `AVG OBJECTS COUNT PER IMAGE (%)`
