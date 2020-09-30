@@ -50,9 +50,10 @@ App saves resulting report to "Files": `/reports/classes_stats/{USER_LOGIN}/{WOR
 
 ## Explanation
 
+### Per image stats
 <img src="https://i.imgur.com/ysZEQGN.png"/>
 
-Fields:
+Columns:
 * `IMAGE ID` - image id in Supervisely Instance
 * `IMAGE` - image name with direct link to annotation tool. You can use table to find some anomalies or edge cases in your data by sorting different columns and then quickly open images with annotations to investigate deeper. 
 * `HEIGHT`, `WIDTH` - image resolution in pixels
@@ -62,4 +63,3 @@ Fields:
 Columns for every class:
 * <img src="https://i.imgur.com/tyDf3qi.png" width="100"/> - class area (%)
 * <img src="https://i.imgur.com/1EquheL.png" width="100"/> - number of objects of a given class (%)
-* dfsfsf
