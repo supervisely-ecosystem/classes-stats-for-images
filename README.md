@@ -50,7 +50,7 @@ App saves resulting report to "Files": `/reports/classes_stats/{USER_LOGIN}/{WOR
 
 ## Explanation
 
-<img src="https://i.imgur.com/HPQbm7k.png"/>
+<img src="https://i.imgur.com/26n6Ufu.png"/>
 
 Fields:
 * `IMAGE ID` - image id in Supervisely Instance
