@@ -55,3 +55,7 @@ App saves resulting report to "Files": `/reports/classes_stats/{USER_LOGIN}/{WOR
 Fields:
 * `IMAGE ID` - image id in Supervisely Instance
 * `IMAGE` - image name with direct link to annotation tool. You can use table to find some anomalies or edge cases in your data by sorting different columns and then quickly open images with annotations to investigate deeper. 
+* `HEIGHT`, `WIDTH` - image resolution in pixels
+* `CHANNELS` - number of image channels
+* `UNLABELED` - percentage of pixels (image area)
+* 
