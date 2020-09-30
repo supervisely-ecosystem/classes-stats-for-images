@@ -52,7 +52,7 @@ App saves resulting report to "Files": `/reports/classes_stats/{USER_LOGIN}/{WOR
 ## Explanation
 
 ### Per Image Stats
-<img src="https://i.imgur.com/ysZEQGN.png"/>
+<img src="https://i.imgur.com/9Hl78Lg.png"/>
 
 Columns:
 * `IMAGE ID` - image id in Supervisely Instance
