@@ -30,9 +30,6 @@ This app **"Classes Stats for Images"** generates report with detailed general a
 
 ### Run from contet menu of project / dataset
 
-Go to "Context Menu" -> ""
+Go to "Context Menu" (images project or dataset) -> "Report" -> "Classes stats for images"
 
 <img src="https://i.imgur.com/dGGzVsm.png" width="600"/>
-
-sasdad
-To run the app go to context menu of "IMAGES" project or dataset. 
