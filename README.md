@@ -59,3 +59,4 @@ Fields:
 * `CHANNELS` - number of image channels
 * `UNLABELED` - percentage of pixels (image area)
 * 
+* dfsfsf
