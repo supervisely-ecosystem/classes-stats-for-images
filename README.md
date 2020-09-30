@@ -33,9 +33,10 @@ Go to "Context Menu" (images project or dataset) -> "Report" -> "Classes stats f
 
 <img src="https://i.imgur.com/dGGzVsm.png" width="600"/>
 
-### Sample data (Optional)
+### Configure running settings
 
-Choose the percentage of images that should be randomly sampled. By default all images will be used. 
+Choose the percentage of images that should be randomly sampled. By default all images will be used. And then press "Run" button. In advanced settings you can change agent that will host the app and change version (latest available version is used by default).
+
 
 
 ###
