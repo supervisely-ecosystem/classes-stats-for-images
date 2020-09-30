@@ -27,4 +27,4 @@ This app generates report with detailed general and per image statistics for all
 
 ## How to use
 
-ssss
+To run the app go to context menu of "IMAGES" project or dataset. 
