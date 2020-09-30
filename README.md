@@ -39,4 +39,6 @@ Choose the percentage of images that should be randomly sampled. By default all 
 
 ### Open app
 
-After you run the app, new task appear in workspace tasks. Monitor progress from both "Tasks" list and from application page. To open report in new tab click "Open" button. App will save a report to "Files": `dsdas/dasdasd/ads` 
+Once app is started, new task appear in workspace tasks. Monitor progress from both "Tasks" list and from application page. To open report in a new tab click "Open" button. 
+
+App saves resulting report to "Files": `/reports/classes_stats/{USER_LOGIN}/{WORKSPACE_NAME}/{PROJECT_NAME}.lnk`. To open report file in future use "Right mouse click" -> "Open".
