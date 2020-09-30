@@ -27,4 +27,8 @@ This app **"Classes Stats for Images"** generates report with detailed general a
 
 ## How To Use
 
+
+### Run from contet menu of project / dataset
+
+sasdad
 To run the app go to context menu of "IMAGES" project or dataset. 
