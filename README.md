@@ -80,5 +80,10 @@ Columns for every class:
 ```
  
 * `AVG OBJECTS COUNT PER IMAGE (%)` - 
+```
+              total number of class objects               
+ -------------------------------------------------------------- 
+ the number of images with at least one object of a given class 
+```
 
 
