@@ -2,6 +2,7 @@
 
 <img src="https://i.imgur.com/cISE5uw.png"/>
 
+# Classes Stats for Images 
 # 
   
 <p align="center">
