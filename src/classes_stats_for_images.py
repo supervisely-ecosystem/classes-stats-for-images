@@ -333,9 +333,7 @@ def main():
     }
 
     # Run application service
-    #my_app.run(data=data, state=state, initial_events=[{"command": "calc"}, {"command": "stop"}])
     my_app.run(data=data, state=state, initial_events=[{"command": "calc"}])
-    my_app.wait_all()
 
 
 if __name__ == "__main__":
