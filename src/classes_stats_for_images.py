@@ -174,6 +174,11 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
             api.task.set_fields(task_id, fields)
             task_progress.iters_done_report(len(batch_stats))
 
+            if my_app.stop_event.is_set():
+                break
+        if my_app.stop_event.is_set():
+            break
+
     # average nonzero class area per image
     with np.errstate(divide='ignore'):
         avg_nonzero_area = np.divide(sum_class_area_per_image, count_images_with_class)
