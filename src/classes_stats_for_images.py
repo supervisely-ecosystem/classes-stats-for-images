@@ -83,11 +83,14 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     project = api.project.get_info_by_id(PROJECT_ID)
     if datasets is None:
         datasets = api.dataset.get_list(PROJECT_ID)
+    ds_images, sample_count = sample_images(api, datasets)
 
     fields = [
         {"field": "data.projectName", "payload": project.name},
         {"field": "data.projectId", "payload": project.id},
-        {"field": "data.projectPreviewUrl", "payload": api.image.preview_url(project.reference_image_url, 100, 100)}
+        {"field": "data.projectPreviewUrl", "payload": api.image.preview_url(project.reference_image_url, 100, 100)},
+        {"field": "data.samplePercent", "payload": SAMPLE_PERCENT},
+        {"field": "data.sampleCount", "payload": sample_count},
     ]
     api.task.set_fields(task_id, fields)
 
@@ -117,7 +120,6 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
 
     api.task.set_field(task_id, "data.table.columns", table_columns)
 
-    ds_images, sample_count = sample_images(api, datasets)
     all_stats = []
     task_progress = sly.Progress("Stats", sample_count, app_logger)
     for dataset_id, images in ds_images.items():
@@ -322,7 +324,9 @@ def main():
             "data": []
         },
         "savePath": "...",
-        "reportName": "..."
+        "reportName": "...",
+        "samplePercent": "",
+        "sampleCount": ""
     }
 
     state = {
