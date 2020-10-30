@@ -148,19 +148,22 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
                 table_row.append('<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>'
                                  .format(api.image.url(TEAM_ID, WORKSPACE_ID, project.id, dataset.id, info.id), info.name))
                 table_row.append(dataset.name)
+                area_unl = stat_area["unlabeled"] if not np.isnan(stat_area["unlabeled"]) else 0
                 table_row.extend([stat_area["height"],
                                   stat_area["width"],
                                   stat_area["channels"],
-                                  round(stat_area["unlabeled"], 2)])
+                                  round(area_unl, 2)])
                 resolutions_count["{}x{}x{}".format(stat_area["height"], stat_area["width"], stat_area["channels"])] += 1
                 for idx, class_name in enumerate(class_names):
-                    sum_class_area_per_image[idx] += stat_area[class_name]
-                    sum_class_count_per_image[idx] += stat_count[class_name]
+                    cur_area = stat_area[class_name] if not np.isnan(stat_area[class_name]) else 0
+                    cur_count = stat_count[class_name] if not np.isnan(stat_count[class_name]) else 0
+                    sum_class_area_per_image[idx] += cur_area
+                    sum_class_count_per_image[idx] += cur_count
                     count_images_with_class[idx] += 1 if stat_count[class_name] > 0 else 0
                     if class_name == "unlabeled":
                         continue
-                    table_row.append(round(stat_area[class_name], 2))
-                    table_row.append(round(stat_count[class_name], 2))
+                    table_row.append(round(cur_area, 2))
+                    table_row.append(round(cur_count, 2))
 
                 if len(table_row) != len(table_columns):
                     raise RuntimeError("Values for some columns are missed")
@@ -276,7 +279,7 @@ def calc(api: sly.Api, task_id, context, state, app_logger):
     remote_path = api.file.get_free_name(TEAM_ID, remote_path)
     report_name = sly.fs.get_file_name_with_ext(remote_path)
     file_info = api.file.upload(TEAM_ID, local_path, remote_path)
-    report_url = api.file.get_url(file_info["id"])
+    report_url = api.file.get_url(file_info.id)
 
     fields = [
         {"field": "data.overviewTable", "payload": overviewTable},
