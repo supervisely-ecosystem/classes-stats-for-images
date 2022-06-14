@@ -1,14 +1,15 @@
 import os
-import supervisely_lib as sly
+import supervisely as sly
 import random
 from collections import defaultdict
 import json
 import numpy as np
 import plotly.graph_objects as go
+from supervisely.app.v1.app_service import AppService
 import time
 #np.seterr(divide='ignore')
 
-my_app = sly.AppService()
+my_app: AppService = AppService()
 
 TEAM_ID = int(os.environ['context.teamId'])
 WORKSPACE_ID = int(os.environ['context.workspaceId'])
