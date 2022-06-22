@@ -6,7 +6,7 @@
     "visualization",
     "exploration",
     "statistics",
-    "visualization-stats"
+    "visualization stats"
   ],
   "description": "Detailed statistics for all classes in images project",
   "docker_image": "supervisely/base-py-sdk:6.23.1",
