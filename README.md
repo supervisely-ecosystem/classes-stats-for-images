@@ -1,6 +1,6 @@
 <div align="center" markdown> 
 
-<img src="https://i.imgur.com/cISE5uw.png"/>
+<img src="https://user-images.githubusercontent.com/48245050/182843504-6b2bd2fc-b976-4b97-923e-e4bc568b833e.jpg"/>
 
 # Classes Stats for Images 
   
