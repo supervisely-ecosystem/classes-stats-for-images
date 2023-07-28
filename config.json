@@ -9,7 +9,7 @@
         "visualization stats"
     ],
     "description": "Detailed statistics for all classes in images project",
-    "docker_image": "supervisely/visualization-stats:None",
+    "docker_image": "supervisely/visualization-stats:0.0.1",
     "instance_version": "6.4.57",
     "main_script": "src/classes_stats_for_images.py",
     "modal_template": "src/modal.html",
