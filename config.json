@@ -1,32 +1,32 @@
 {
-  "name": "Classes stats for images",
-  "type": "app",
-  "categories": [
-    "images",
-    "visualization",
-    "exploration",
-    "statistics",
-    "visualization stats"
-  ],
-  "description": "Detailed statistics for all classes in images project",
-  "docker_image": "supervisely/base-py-sdk:6.72.70",
-  "instance_version": "6.4.57",
-  "main_script": "src/classes_stats_for_images.py",
-  "modal_template": "src/modal.html",
-  "modal_template_state": {
-    "samplePercent": 25
-  },
-  "gui_template": "src/gui.html",
-  "task_location": "workspace_tasks",
-  "isolate": true,
-  "context_menu": {
-    "target": [
-      "images_project",
-      "images_dataset"
+    "name": "Classes stats for images",
+    "type": "app",
+    "categories": [
+        "images",
+        "visualization",
+        "exploration",
+        "statistics",
+        "visualization stats"
     ],
-    "context_root": "Report"
-  },
-  "icon": "https://img.icons8.com/fluent/96/000000/combo-chart.png",
-  "icon_background": "#FFFFFF",
-  "poster": "https://i.imgur.com/cISE5uw.png"
+    "description": "Detailed statistics for all classes in images project",
+    "docker_image": "supervisely/visualization-stats:0.0.1",
+    "instance_version": "6.4.57",
+    "main_script": "src/classes_stats_for_images.py",
+    "modal_template": "src/modal.html",
+    "modal_template_state": {
+        "samplePercent": 25
+    },
+    "gui_template": "src/gui.html",
+    "task_location": "workspace_tasks",
+    "isolate": true,
+    "context_menu": {
+        "target": [
+            "images_project",
+            "images_dataset"
+        ],
+        "context_root": "Report"
+    },
+    "icon": "https://img.icons8.com/fluent/96/000000/combo-chart.png",
+    "icon_background": "#FFFFFF",
+    "poster": "https://i.imgur.com/cISE5uw.png"
 }
