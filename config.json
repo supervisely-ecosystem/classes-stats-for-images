@@ -1,32 +1,32 @@
 {
-    "name": "Classes stats for images",
-    "type": "app",
-    "categories": [
-        "images",
-        "visualization",
-        "exploration",
-        "statistics",
-        "visualization stats"
+  "name": "Classes stats for images",
+  "type": "app",
+  "categories": [
+    "images",
+    "visualization",
+    "exploration",
+    "statistics",
+    "visualization stats"
+  ],
+  "description": "Detailed statistics for all classes in images project",
+  "docker_image": "supervisely/visualization-stats:6.73.22",
+  "instance_version": "6.8.73",
+  "main_script": "src/classes_stats_for_images.py",
+  "modal_template": "src/modal.html",
+  "modal_template_state": {
+    "samplePercent": 25
+  },
+  "gui_template": "src/gui.html",
+  "task_location": "workspace_tasks",
+  "isolate": true,
+  "context_menu": {
+    "target": [
+      "images_project",
+      "images_dataset"
     ],
-    "description": "Detailed statistics for all classes in images project",
-    "docker_image": "supervisely/visualization-stats:6.72.132",
-    "instance_version": "6.4.57",
-    "main_script": "src/classes_stats_for_images.py",
-    "modal_template": "src/modal.html",
-    "modal_template_state": {
-        "samplePercent": 25
-    },
-    "gui_template": "src/gui.html",
-    "task_location": "workspace_tasks",
-    "isolate": true,
-    "context_menu": {
-        "target": [
-            "images_project",
-            "images_dataset"
-        ],
-        "context_root": "Report"
-    },
-    "icon": "https://github-production-user-asset-6210df.s3.amazonaws.com/48245050/264698223-d3c95624-9082-4895-bf05-40b61e47b81a.png",
-    "icon_background": "#FFFFFF",
-    "poster": "https://github-production-user-asset-6210df.s3.amazonaws.com/48245050/264698175-9d0e0f0d-a8ed-4ae2-9a5c-1327df3bd30e.png"
+    "context_root": "Report"
+  },
+  "icon": "https://github-production-user-asset-6210df.s3.amazonaws.com/48245050/264698223-d3c95624-9082-4895-bf05-40b61e47b81a.png",
+  "icon_background": "#FFFFFF",
+  "poster": "https://github-production-user-asset-6210df.s3.amazonaws.com/48245050/264698175-9d0e0f0d-a8ed-4ae2-9a5c-1327df3bd30e.png"
 }
